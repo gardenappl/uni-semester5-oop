@@ -33,4 +33,12 @@ public class Train {
         }
         return totalCapacityKg;
     }
+    
+    public List<TrainVehicle> getVehicles() {
+        return new ArrayList<>(trainVehicles);
+    }
+    
+    public int getVehicleCount() {
+        return trainVehicles.size();
+    }
 }
