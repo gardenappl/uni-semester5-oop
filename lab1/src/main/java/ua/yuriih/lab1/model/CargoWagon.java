@@ -1,4 +1,4 @@
-package ua.yuriih.lab1.train;
+package ua.yuriih.lab1.model;
 
 public class CargoWagon extends TrainVehicle {
     private final int capacityKg;

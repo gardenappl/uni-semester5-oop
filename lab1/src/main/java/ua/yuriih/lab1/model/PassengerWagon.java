@@ -1,4 +1,4 @@
-package ua.yuriih.lab1.train;
+package ua.yuriih.lab1.model;
 
 public class PassengerWagon extends TrainVehicle {
     private final int capacity;
@@ -6,6 +6,12 @@ public class PassengerWagon extends TrainVehicle {
 
     public PassengerWagon(String name, int capacity, int comfortLevel) {
         super(name);
+        this.capacity = capacity;
+        this.comfortLevel = comfortLevel;
+    }
+
+    public PassengerWagon(String name, int capacity, int comfortLevel, int horsepower) {
+        super(name, horsepower);
         this.capacity = capacity;
         this.comfortLevel = comfortLevel;
     }

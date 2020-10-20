@@ -1,12 +1,15 @@
-package ua.yuriih.lab1.train;
+package ua.yuriih.lab1.model;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Train {
     private final ArrayList<TrainVehicle> trainVehicles;
+    private final String name;
     
-    public Train(List<TrainVehicle> wagons) {
+    public Train(String name, List<TrainVehicle> wagons) {
+        this.name = name;
+
         if (wagons.get(0).getHorsepower() == 0 &&
                 wagons.get(wagons.size() - 1).getHorsepower() == 0) {
             throw new IllegalArgumentException("Train must have powered vehicles on at least one end.");
@@ -40,5 +43,9 @@ public class Train {
     
     public int getVehicleCount() {
         return trainVehicles.size();
+    }
+
+    public String getName() {
+        return name;
     }
 }

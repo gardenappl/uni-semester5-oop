@@ -1,10 +1,10 @@
-package ua.yuriih.lab1.train;
+package ua.yuriih.lab1.model;
 
 public abstract class TrainVehicle {
     private final String name;
     /**
      * The horsepower field is stored in TrainVehicle as opposed to Locomotive,
-     * because apparently there are trains with no distinct locomotives. They
+     * because there exist trains with no distinct locomotives. They
      * consist entirely of passenger wagons and each of them has its own motor.
      */
     private final int horsepower;
