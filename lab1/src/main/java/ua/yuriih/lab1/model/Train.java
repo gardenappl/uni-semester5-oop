@@ -21,7 +21,7 @@ public class Train {
         int totalCapacity = 0;
         for (TrainVehicle vehicle : trainVehicles) {
             if (vehicle instanceof PassengerWagon) {
-                totalCapacity += ((PassengerWagon) vehicle).getCapacity();
+                totalCapacity += ((PassengerWagon) vehicle).getPassengerCapacity();
             }
         }
         return totalCapacity;
@@ -30,11 +30,19 @@ public class Train {
     public int getCargoCapacity() {
         int totalCapacityKg = 0;
         for (TrainVehicle vehicle : trainVehicles) {
-            if (vehicle instanceof CargoWagon) {
-                totalCapacityKg += ((CargoWagon) vehicle).getCapacityKg();
+            if (vehicle instanceof PassengerWagon) {
+                totalCapacityKg += ((PassengerWagon) vehicle).getCargoCapacityKg();
             }
         }
         return totalCapacityKg;
+    }
+
+    public int getHorsepower() {
+        int totalHP = 0;
+        for (TrainVehicle vehicle : trainVehicles) {
+            totalHP += vehicle.getHorsepower();
+        }
+        return totalHP;
     }
     
     public List<TrainVehicle> getVehicles() {

@@ -11,7 +11,7 @@ import java.util.Comparator;
 public class TrainConsoleView {
     public enum PassengerWagonSort {
         CAPACITY((wagon1, wagon2) -> {
-            return Integer.compare(wagon1.getCapacity(), wagon2.getCapacity());
+            return Integer.compare(wagon1.getPassengerCapacity(), wagon2.getPassengerCapacity());
         }),
         COMFORT((wagon1, wagon2) -> {
             return Integer.compare(wagon1.getComfortLevel(), wagon2.getComfortLevel());
@@ -66,9 +66,11 @@ public class TrainConsoleView {
     private String getWagonInfo(PassengerWagon wagon) {
         StringBuilder sb = new StringBuilder()
                 .append(wagon.getName())
-                .append(": capacity = ")
-                .append(wagon.getCapacity())
-                .append(", comfort = ")
+                .append(": passenger capacity = ")
+                .append(wagon.getPassengerCapacity())
+                .append(": cargo capacity = ")
+                .append(wagon.getCargoCapacityKg())
+                .append(" kg, comfort = ")
                 .append(wagon.getComfortLevel());
         if (wagon.getHorsepower() > 0) {
             sb.append(", HP = ");
@@ -79,8 +81,8 @@ public class TrainConsoleView {
 
     private ArrayList<PassengerWagon> findPassengerWagons(int minCapacity, int maxCapacity) {
         ArrayList<PassengerWagon> passengerWagons = getPassengerWagons();
-        passengerWagons.removeIf(wagon -> wagon.getCapacity() < minCapacity ||
-                wagon.getCapacity() > maxCapacity);
+        passengerWagons.removeIf(wagon -> wagon.getPassengerCapacity() < minCapacity ||
+                wagon.getPassengerCapacity() > maxCapacity);
         return passengerWagons;
     }
     
@@ -95,7 +97,8 @@ public class TrainConsoleView {
     }
     
     public void printTrainInfo(PrintStream output) {
-        output.printf("Train #%s: passenger capacity = %d, cargo capacity = %d Kg\n",
-                train.getName(), train.getPassengerCapacity(), train.getCargoCapacity());
+        output.printf("%s: passenger capacity = %d, cargo capacity = %d Kg, power = %d HP\n",
+                train.getName(), train.getPassengerCapacity(),
+                train.getCargoCapacity(), train.getHorsepower());
     }
 }
