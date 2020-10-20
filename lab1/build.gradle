@@ -15,3 +15,7 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+application {
+    mainClass = 'ua.yuriih.lab1.Main'
+}
