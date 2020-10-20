@@ -15,16 +15,15 @@ public class TrainConsoleView {
         }),
         COMFORT((wagon1, wagon2) -> {
             return Integer.compare(wagon1.getComfortLevel(), wagon2.getComfortLevel());
-        });
+        }),
+        CARGO((wagon1, wagon2) -> {
+            return Integer.compare(wagon1.getCargoCapacityKg(), wagon2.getCargoCapacityKg());
+        });;
 
         private final Comparator<PassengerWagon> comparator;
 
         PassengerWagonSort(Comparator<PassengerWagon> comparator) {
             this.comparator = comparator;
-        }
-
-        Comparator<PassengerWagon> getComparator() {
-            return comparator;
         }
     }
 
@@ -49,7 +48,7 @@ public class TrainConsoleView {
 
     private ArrayList<PassengerWagon> sortPassengerWagons(PassengerWagonSort sort) {
         ArrayList<PassengerWagon> passengerWagons = getPassengerWagons();
-        passengerWagons.sort(sort.getComparator());
+        passengerWagons.sort(sort.comparator);
         return passengerWagons;
     }
     
@@ -68,7 +67,7 @@ public class TrainConsoleView {
                 .append(wagon.getName())
                 .append(": passenger capacity = ")
                 .append(wagon.getPassengerCapacity())
-                .append(": cargo capacity = ")
+                .append(", cargo capacity = ")
                 .append(wagon.getCargoCapacityKg())
                 .append(" kg, comfort = ")
                 .append(wagon.getComfortLevel());
@@ -97,7 +96,7 @@ public class TrainConsoleView {
     }
     
     public void printTrainInfo(PrintStream output) {
-        output.printf("%s: passenger capacity = %d, cargo capacity = %d Kg, power = %d HP\n",
+        output.printf("%s: passenger capacity = %d, cargo capacity = %d kg, power = %d HP\n",
                 train.getName(), train.getPassengerCapacity(),
                 train.getCargoCapacity(), train.getHorsepower());
     }

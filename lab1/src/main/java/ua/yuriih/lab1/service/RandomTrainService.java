@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class RandomTrainService {
-    Random rng = new Random();
+    private Random rng = new Random();
 
     public Train makeRandomTrain() {
         boolean useLocomotives = rng.nextBoolean();
