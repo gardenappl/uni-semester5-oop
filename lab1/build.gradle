@@ -1,0 +1,17 @@
+plugins {
+    id 'application'
+}
+
+group 'ua.yuriih'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.junit.jupiter:junit-jupiter:5.6.2'
+}
+
+test {
+    useJUnitPlatform()
+}
