@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -45,5 +46,18 @@ class TrainTest {
     @Test
     void getName() {
         assertEquals("Test Train", train.getName());
+    }
+
+    @Test
+    void trainConstructorTest() {
+        assertThrows(IllegalArgumentException.class,
+                () -> new Train("Empty train", new ArrayList<>()));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> new Train("Train with no engine",
+                        Collections.singletonList(new PassengerWagon("Test", 0, 0, 0))));
+
+        assertDoesNotThrow(() -> new Train("Train with locomotive",
+                Collections.singletonList(new Locomotive("Loco", 4000))));
     }
 }

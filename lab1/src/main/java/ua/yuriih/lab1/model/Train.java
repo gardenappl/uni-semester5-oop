@@ -10,6 +10,9 @@ public class Train {
     public Train(String name, List<TrainVehicle> wagons) {
         this.name = name;
 
+        if (wagons.isEmpty())
+            throw new IllegalArgumentException("Train must have at least one vehicle.");
+
         if (wagons.get(0).getHorsepower() == 0 &&
                 wagons.get(wagons.size() - 1).getHorsepower() == 0) {
             throw new IllegalArgumentException("Train must have powered vehicles on at least one end.");
