@@ -3,7 +3,6 @@ package ua.yuriih.lab1.view;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ua.yuriih.lab1.TestUtils;
-import ua.yuriih.lab1.model.Locomotive;
 import ua.yuriih.lab1.model.PassengerWagon;
 import ua.yuriih.lab1.model.Train;
 import ua.yuriih.lab1.model.TrainVehicle;
@@ -13,14 +12,14 @@ import java.util.Arrays;
 import java.util.List;
 
 class TrainConsoleViewTest {
-    private List<TrainVehicle> vehicles = Arrays.asList(
-            new Locomotive("Test Locomotive", 5000),
+    private final List<TrainVehicle> vehicles = Arrays.asList(
+            new TrainVehicle("Test Locomotive", 5000),
             new PassengerWagon("Wagon 1", 30, 30, 2),
             new PassengerWagon("Wagon 2", 10, 50, 0),
             new PassengerWagon("Comfy Wagon", 5, 100, 5)
     );
-    private Train train = new Train("Test Train", vehicles);
-    private TrainConsoleView view = new TrainConsoleView(train);
+    private final Train train = new Train("Test Train", vehicles);
+    private final TrainConsoleView view = new TrainConsoleView(train);
 
     //Large enough to read all output at once
     private static final int BYTE_ARRAY_SIZE = 10000;

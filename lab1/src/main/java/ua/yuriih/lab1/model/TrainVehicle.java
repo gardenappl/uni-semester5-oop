@@ -1,15 +1,13 @@
 package ua.yuriih.lab1.model;
 
-public abstract class TrainVehicle {
+public class TrainVehicle {
     private final String name;
-    /**
-     * The horsepower field is stored in TrainVehicle as opposed to Locomotive,
-     * because there exist trains with no distinct locomotives. They
-     * consist entirely of passenger wagons and each of them has its own motor.
-     */
     private final int horsepower;
     
     public TrainVehicle(String name, int horsepower) {
+        if (horsepower < 0)
+            throw new IllegalArgumentException("Vehicle must not have less than 0 horsepower.");
+
         this.name = name;
         this.horsepower = horsepower;
     }
@@ -24,5 +22,9 @@ public abstract class TrainVehicle {
     
     public int getHorsepower() {
         return horsepower;
+    }
+
+    public boolean canPullOrPushTrain() {
+        return horsepower > 0;
     }
 }

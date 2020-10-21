@@ -4,19 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Train {
-    private final ArrayList<TrainVehicle> trainVehicles;
+    private final List<TrainVehicle> trainVehicles;
     private final String name;
     
     public Train(String name, List<TrainVehicle> wagons) {
-        this.name = name;
-
         if (wagons.isEmpty())
             throw new IllegalArgumentException("Train must have at least one vehicle.");
 
-        if (wagons.get(0).getHorsepower() == 0 &&
-                wagons.get(wagons.size() - 1).getHorsepower() == 0) {
+        if (!wagons.get(0).canPullOrPushTrain() &&
+                !wagons.get(wagons.size() - 1).canPullOrPushTrain()) {
             throw new IllegalArgumentException("Train must have powered vehicles on at least one end.");
         }
+
+        this.name = name;
         trainVehicles = new ArrayList<>(wagons);
     }
     

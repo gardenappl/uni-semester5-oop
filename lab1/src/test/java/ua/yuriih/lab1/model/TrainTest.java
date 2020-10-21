@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class TrainTest {
     private List<TrainVehicle> vehicles = Arrays.asList(
-            new Locomotive("Test Locomotive", 5000),
+            new TrainVehicle("Test Locomotive", 5000),
             new PassengerWagon("Wagon 1", 30, 30, 0),
             new PassengerWagon("Wagon 2", 10, 50, 2),
             new PassengerWagon("Comfy Wagon", 5, 100, 5)
@@ -58,6 +58,6 @@ class TrainTest {
                         Collections.singletonList(new PassengerWagon("Test", 0, 0, 0))));
 
         assertDoesNotThrow(() -> new Train("Train with locomotive",
-                Collections.singletonList(new Locomotive("Loco", 4000))));
+                Collections.singletonList(new TrainVehicle("Loco", 4000))));
     }
 }

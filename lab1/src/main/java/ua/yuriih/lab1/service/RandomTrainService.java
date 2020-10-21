@@ -1,6 +1,5 @@
 package ua.yuriih.lab1.service;
 
-import ua.yuriih.lab1.model.Locomotive;
 import ua.yuriih.lab1.model.PassengerWagon;
 import ua.yuriih.lab1.model.Train;
 import ua.yuriih.lab1.model.TrainVehicle;
@@ -12,17 +11,17 @@ public class RandomTrainService {
     private Random rng = new Random();
 
     public Train makeRandomTrain() {
-        boolean useLocomotives = rng.nextBoolean();
+        boolean locomotiveIsPassengerWagon = rng.nextBoolean();
         int length = 5 + rng.nextInt(5);
         ArrayList<TrainVehicle> wagons = new ArrayList<>(length);
 
-        wagons.add(makePoweredVehicle(useLocomotives));
+        wagons.add(makePoweredVehicle(locomotiveIsPassengerWagon));
 
         for (int i = 1; i < length - 1; i++)
             wagons.add(makePassengerWagon(false));
 
         if (rng.nextBoolean())
-            wagons.add(makePoweredVehicle(useLocomotives));
+            wagons.add(makePoweredVehicle(locomotiveIsPassengerWagon));
         else
             wagons.add(makePassengerWagon(false));
 
@@ -30,11 +29,11 @@ public class RandomTrainService {
         return new Train(name, wagons);
     }
     
-    private TrainVehicle makePoweredVehicle(boolean useLocomotives) {
-        if (useLocomotives)
-            return makeLocomotive();
-        else
+    private TrainVehicle makePoweredVehicle(boolean locomotiveIsPassengerWagon) {
+        if (locomotiveIsPassengerWagon)
             return makePassengerWagon(true);
+        else
+            return makeLocomotive();
     }
     
     private PassengerWagon makePassengerWagon(boolean powered) {
@@ -46,9 +45,9 @@ public class RandomTrainService {
         return new PassengerWagon(name, passengerCapacity, cargoCapacityKg, comfortLevel, horsepower);
     }
 
-    private Locomotive makeLocomotive() {
+    private TrainVehicle makeLocomotive() {
         String name = "Wagon P-" + rng.nextInt(1000);
         int horsepower = 2000 + rng.nextInt(5000);
-        return new Locomotive(name, horsepower);
+        return new TrainVehicle(name, horsepower);
     }
 }
