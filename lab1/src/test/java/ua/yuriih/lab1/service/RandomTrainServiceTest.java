@@ -13,7 +13,7 @@ class RandomTrainServiceTest {
         RandomTrainService trainService = new RandomTrainService();
 
         for (int i = 0; i < 100; i++) {
-            assertDoesNotThrow(trainService::makeRandomTrain);
+            assertNotNull(trainService.makeRandomTrain());
         }
     }
 }
