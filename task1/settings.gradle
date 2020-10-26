@@ -1,2 +1,4 @@
 rootProject.name = 'task1'
+include 'client'
+include 'server'
 

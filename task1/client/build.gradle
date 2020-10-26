@@ -1,0 +1,9 @@
+plugins {
+    id 'application'
+}
+
+group 'ua.yuriih'
+
+application {
+    mainClassName = 'ua.yuriih.task1.KnockKnockClient'
+}
