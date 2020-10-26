@@ -5,7 +5,7 @@ plugins {
 group 'ua.yuriih'
 
 dependencies {
-    compile project(':myobjlib')
+    implementation project(':myobjlib')
 }
 
 application {
