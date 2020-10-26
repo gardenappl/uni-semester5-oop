@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ObjectServerTest {
+public class ClientServerTest {
     @Test
     @DisplayName("Send and receive ExampleObject")
     public void sendAndReceive() throws InterruptedException {

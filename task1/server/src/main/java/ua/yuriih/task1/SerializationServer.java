@@ -9,6 +9,9 @@ public class SerializationServer implements Runnable {
     private ServerSocket serverSocket = null;
     
     public SerializationServer(int portNumber, ExampleObject objToSend) throws IOException {
+        if (objToSend == null)
+            throw new IllegalArgumentException("Object must not be null.");
+
         serverSocket = new ServerSocket(portNumber);
         this.portNumber = portNumber;
         this.objectToSend = objToSend;
@@ -16,8 +19,6 @@ public class SerializationServer implements Runnable {
 
     @Override
     public void run() {
-
-        
         try (
                 Socket clientSocket = serverSocket.accept();
                 ObjectOutputStream out =
