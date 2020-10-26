@@ -4,6 +4,10 @@ plugins {
 
 group 'ua.yuriih'
 
+dependencies {
+    compile project(':myobjlib')
+}
+
 application {
     mainClassName = 'ua.yuriih.task1.KnockKnockServer'
 }
