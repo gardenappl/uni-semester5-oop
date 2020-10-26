@@ -6,10 +6,12 @@ import java.util.Objects;
 public class ExampleObject implements Serializable {
     private final int exampleInt;
     private final String exampleString;
+    private transient final int otherInt;
     
-    public ExampleObject(int exampleInt, String exampleString) {
+    public ExampleObject(int exampleInt, String exampleString, int otherInt) {
         this.exampleInt = exampleInt;
         this.exampleString = exampleString;
+        this.otherInt = otherInt;
     }
 
     public int getExampleInt() {
@@ -20,17 +22,31 @@ public class ExampleObject implements Serializable {
         return exampleString;
     }
 
+    public int getOtherInt() {
+        return otherInt;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ExampleObject that = (ExampleObject) o;
-        return getExampleInt() == that.getExampleInt() &&
-                Objects.equals(getExampleString(), that.getExampleString());
+        ExampleObject object = (ExampleObject) o;
+        return getExampleInt() == object.getExampleInt() &&
+                getOtherInt() == object.getOtherInt() &&
+                Objects.equals(getExampleString(), object.getExampleString());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getExampleInt(), getExampleString());
+        return Objects.hash(getExampleInt(), getExampleString(), getOtherInt());
+    }
+
+    @Override
+    public String toString() {
+        return "ExampleObject{" +
+                "exampleInt=" + exampleInt +
+                ", exampleString='" + exampleString + '\'' +
+                ", otherInt=" + otherInt +
+                '}';
     }
 }

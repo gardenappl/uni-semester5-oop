@@ -9,5 +9,5 @@ dependencies {
 }
 
 application {
-    mainClassName = 'ua.yuriih.task1.KnockKnockServer'
+    mainClassName = 'ua.yuriih.task1.SerializationServer'
 }
