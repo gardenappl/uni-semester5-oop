@@ -3,28 +3,35 @@ package ua.yuriih.task1;
 import java.net.*;
 import java.io.*;
 
-public class SerializationServer {
-    public static void main(String[] args) {
-        if (args.length != 1) {
-            System.err.println("Usage: java ua.yuriih.task1.SerializationServer <port number>");
-            System.exit(1);
-        }
+public class SerializationServer implements Runnable {
+    private final int portNumber;
+    private final ExampleObject objectToSend;
+    private ServerSocket serverSocket = null;
+    
+    public SerializationServer(int portNumber, ExampleObject objToSend) throws IOException {
+        serverSocket = new ServerSocket(portNumber);
+        this.portNumber = portNumber;
+        this.objectToSend = objToSend;
+    }
 
-        int portNumber = Integer.parseInt(args[0]);
+    @Override
+    public void run() {
 
+        
         try (
-                ServerSocket serverSocket = new ServerSocket(portNumber);
                 Socket clientSocket = serverSocket.accept();
                 ObjectOutputStream out =
                         new ObjectOutputStream(clientSocket.getOutputStream());
         ) {
-
-            ExampleObject object = new ExampleObject(4891, "Hello", 100000);
-            out.writeObject(object);
+            out.writeObject(objectToSend);
 
         } catch (IOException e) {
-            System.out.println("I/O error on server!");
-            System.out.println(e.getMessage());
+            System.err.println("I/O error on server!");
+            System.err.println(e.getMessage());
         }
+    }
+    
+    public int getListeningPort() {
+        return serverSocket.getLocalPort();
     }
 }

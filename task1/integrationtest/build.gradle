@@ -1,0 +1,20 @@
+plugins {
+    id 'java'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile project(':myobjlib')
+    compile project(':client')
+    compile project(':server')
+    implementation 'org.junit.jupiter:junit-jupiter:5.6.2'
+}
+
+test {
+    useJUnitPlatform();
+}
+
+group 'ua.yuriih'
