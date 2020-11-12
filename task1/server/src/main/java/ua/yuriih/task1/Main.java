@@ -1,5 +1,7 @@
 package ua.yuriih.task1;
 
+import java.net.ServerSocket;
+
 public class Main {
     public static void main(String[] args) {
         if (args.length != 1) {
@@ -11,7 +13,7 @@ public class Main {
         
         ExampleObject object = new ExampleObject(4891, "Hello", 100000);
         try {
-            new SerializationServer(portNumber, object).run();
+            new SerializationServer(new ServerSocket(portNumber), object).run();
         } catch (Exception e) {
             System.err.println("Error: " + e.getMessage());
         }

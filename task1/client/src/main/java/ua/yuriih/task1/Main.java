@@ -1,5 +1,9 @@
 package ua.yuriih.task1;
 
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+
 public class Main {
     public static void main(String[] args) {
 
@@ -12,7 +16,11 @@ public class Main {
         String hostName = args[0];
         int portNumber = Integer.parseInt(args[1]);
 
-        SerializationClient client = new SerializationClient(hostName, portNumber);
-        System.out.println(client.tryRead().toString());
+        try {
+            SerializationClient client = new SerializationClient(new Socket(hostName, portNumber));
+            System.out.println(client.tryRead().toString());
+        } catch (IOException e) {
+            //TODO: log
+        }
     }
 }
