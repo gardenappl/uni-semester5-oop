@@ -1,9 +1,14 @@
 package ua.yuriih.task1;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 import java.net.*;
 
 public class SerializationClient {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SerializationClient.class);
+    
     private final Socket socket;
     
     public SerializationClient(Socket socket) {
@@ -17,10 +22,10 @@ public class SerializationClient {
             return (ExampleObject) in.readObject();
 
         } catch (IOException e) {
-            System.err.println("I/O error while connecting to " + socket.getInetAddress().getHostName());
+            LOGGER.error("I/O error while getting input stream", e);
             System.exit(1);
         } catch (ClassNotFoundException e) {
-            System.err.println("Tried to serialize object with unknown class.");
+            LOGGER.error("Tried to serialize object with unknown class.", e);
             System.exit(1);
         }
         return null;

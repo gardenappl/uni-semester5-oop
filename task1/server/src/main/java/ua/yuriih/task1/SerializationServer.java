@@ -1,9 +1,14 @@
 package ua.yuriih.task1;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.net.*;
 import java.io.*;
 
 public class SerializationServer implements Runnable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SerializationServer.class);
+
     private final ExampleObject objectToSend;
     private final ServerSocket serverSocket;
     
@@ -25,8 +30,7 @@ public class SerializationServer implements Runnable {
             out.writeObject(objectToSend);
 
         } catch (IOException e) {
-            System.err.println("I/O error on server!");
-            System.err.println(e.getMessage());
+            LOGGER.error("I/O error", e);
         }
     }
 }

@@ -1,10 +1,15 @@
 package ua.yuriih.task1;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Main {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
+
     public static void main(String[] args) {
 
         if (args.length != 2) {
@@ -20,7 +25,7 @@ public class Main {
             SerializationClient client = new SerializationClient(new Socket(hostName, portNumber));
             System.out.println(client.tryRead().toString());
         } catch (IOException e) {
-            //TODO: log
+            LOGGER.error("I/O error", e);
         }
     }
 }
