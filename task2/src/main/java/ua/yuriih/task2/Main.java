@@ -7,31 +7,11 @@ import ua.yuriih.task2.linalg.TridiagonalMatrixSystem;
 
 import java.util.Arrays;
 import java.util.Random;
+import java.util.function.Consumer;
 
 public class Main {
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
-    
-    private static TridiagonalMatrixSystem getRandomSolvableSystem(int size, double scale) {
-        double[] c = new double[size];
-        double[] a = new double[size - 1];
-        double[] b = new double[size - 1];
-        double[] d = new double[size];
 
-        Random rng = new Random();
-        for (int i = 0; i < size; i++) {
-            if (i != 0) {
-                a[i - 1] = (rng.nextDouble() - 0.5) * scale;
-                c[i] += a[i - 1];
-            }
-            if (i != size - 1) {
-                b[i] = (rng.nextDouble() - 0.5) * scale;
-                c[i] += b[i];
-            }
-            c[i] += (rng.nextDouble() - 0.5) * scale;
-            d[i] = (rng.nextDouble() - 0.5) * scale;
-        }
-        return new TridiagonalMatrixSystem(new TridiagonalMatrix(a, b, c), d);
-    }
     
     public static void main(String[] args) {
         double[] a = new double[] { 5, -5, 4, 1 };
@@ -50,18 +30,36 @@ public class Main {
         LOGGER.info("Is solution? {}", system.isSolution(x));
 
 
-        system = getRandomSolvableSystem(10000, 5);
+        system = TridiagonalMatrixSystem.getRandomSolvableSystem(2, 5);
         x = system.solve();
         LOGGER.info("Is solution? {}", system.isSolution(x));
         x = system.solve(false);
         LOGGER.info("Is solution? {}", system.isSolution(x));
 
 
-        system = getRandomSolvableSystem(99999, 5);
-        x = system.solve();
-        LOGGER.info("Is solution? {}", system.isSolution(x));
-        x = system.solve(false);
-        LOGGER.info("Is solution? {}", system.isSolution(x));
+        TridiagonalMatrixSystem[] testSystems = new TridiagonalMatrixSystem[100];
+        for (int i = 0; i < testSystems.length; i++)
+            testSystems[i] = TridiagonalMatrixSystem.getRandomSolvableSystem(99999, 5);
 
+
+        runBenchmark(testSystems, "Non-parallel solution",
+                (TridiagonalMatrixSystem testSystem) ->
+                        testSystem.solve(false));
+
+        runBenchmark(testSystems, "Parallel solution",
+                (TridiagonalMatrixSystem testSystem) ->
+                        testSystem.solve(true));
+    }
+    
+    private static void runBenchmark(TridiagonalMatrixSystem[] testSystems,
+                                     String testName,
+                                     Consumer<TridiagonalMatrixSystem> test)
+    {
+        long nanoStart = System.nanoTime();
+        for (TridiagonalMatrixSystem testSystem : testSystems) {
+            test.accept(testSystem);
+        }
+        long nanoEnd = System.nanoTime();
+        LOGGER.info("{}: {} ms", testName, (nanoEnd - nanoStart) / 1_000_000);
     }
 }

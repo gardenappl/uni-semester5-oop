@@ -36,7 +36,7 @@ public class TridiagonalMatrix {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("\n");
+        sb.append("[\n");
         for (int i = 0; i < getSize(); i++) {
             sb.append('[');
             for (int j = 0; j < getSize(); j++) {

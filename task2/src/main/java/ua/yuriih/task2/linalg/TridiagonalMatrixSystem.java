@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import ua.yuriih.task2.linalg.TridiagonalMatrix;
 
 import java.util.Arrays;
+import java.util.Random;
 
 public class TridiagonalMatrixSystem {
     private final TridiagonalMatrix matrix;
@@ -17,45 +18,42 @@ public class TridiagonalMatrixSystem {
         this.d = d;
     }
 
+    //Creates system with diagonally dominant matrix
+    public static TridiagonalMatrixSystem getRandomSolvableSystem(int size, double scale) {
+        double[] c = new double[size];
+        double[] a = new double[size - 1];
+        double[] b = new double[size - 1];
+        double[] d = new double[size];
+
+        Random rng = new Random();
+        for (int i = 0; i < size; i++) {
+            if (i != 0) {
+                a[i - 1] = (rng.nextDouble() - 0.5) * scale;
+                c[i] += Math.abs(a[i - 1]);
+            }
+            if (i != size - 1) {
+                b[i] = (rng.nextDouble() - 0.5) * scale;
+                c[i] += Math.abs(b[i]);
+            }
+            c[i] += Math.abs((rng.nextDouble() - 0.5) * scale);
+            if (rng.nextBoolean())
+                c[i] *= -1;
+            d[i] = (rng.nextDouble() - 0.5) * scale;
+        }
+        return new TridiagonalMatrixSystem(new TridiagonalMatrix(a, b, c), d);
+    }
+
     public TridiagonalMatrix getMatrix() {
         return matrix;
     }
-    
+
+    public double getD(int index) {
+        return d[index];
+    }
+
     @Override
     public String toString() {
         return matrix.toString() + ", d = " + Arrays.toString(d);
-    }
-    
-    public double[] solve() {
-        return solve(true);
-    }
-    
-    public double[] solve(boolean parallel) {
-        if (parallel)
-            return new ParallelSolver(this).solve();
-        
-        //Thomas algorithm
-
-        int n = matrix.getSize();
-        double[] bModified = new double[n - 1];
-        double[] dModified = new double[n - 1];
-
-        bModified[0] = matrix.getB(0) / matrix.getC(0);
-        dModified[0] = d[0] / matrix.getC(0);
-        for (int i = 1; i < n - 1; i++) {
-            double divisor = matrix.getC(i) - matrix.getA(i - 1) * bModified[i - 1];
-            bModified[i] = matrix.getB(i) / divisor;
-            dModified[i] = (d[i] - matrix.getA(i - 1) * dModified[i - 1]) / divisor;
-        }
-        double[] result = new double[n];
-
-        result[n - 1] = (d[n - 1] - matrix.getA(n - 2) * dModified[n - 2]) /
-                (matrix.getC(n - 1) - matrix.getA(n - 2) * bModified[n - 2]);
-
-        for (int i = n - 2; i >= 0; i--) {
-            result[i] = dModified[i] - bModified[i] * result[i + 1];
-        }
-        return result;
     }
     
     public boolean isSolution(double[] x) {
@@ -77,11 +75,44 @@ public class TridiagonalMatrixSystem {
             }
             /*System.err.println("r[" + i + "]: " + result);
             System.err.println("d[" + i + "]: " + d[i]);*/
-            if (Math.abs(result - d[i]) > epsilon)
+            if (Math.abs(result - getD(i)) > epsilon)
                 return false;
         }
         return true;
     }
+
+    public double[] solve() {
+        return solve(true);
+    }
+
+    public double[] solve(boolean parallel) {
+        if (parallel)
+            return new ParallelSolver(this).solve();
+
+        //Standard Thomas algorithm
+
+        int n = matrix.getSize();
+        double[] bModified = new double[n - 1];
+        double[] dModified = new double[n - 1];
+
+        bModified[0] = matrix.getB(0) / matrix.getC(0);
+        dModified[0] = getD(0) / matrix.getC(0);
+        for (int i = 1; i < n - 1; i++) {
+            double divisor = matrix.getC(i) - matrix.getA(i - 1) * bModified[i - 1];
+            bModified[i] = matrix.getB(i) / divisor;
+            dModified[i] = (getD(i) - matrix.getA(i - 1) * dModified[i - 1]) / divisor;
+        }
+        double[] result = new double[n];
+
+        result[n - 1] = (getD(n - 1) - matrix.getA(n - 2) * dModified[n - 2]) /
+                (matrix.getC(n - 1) - matrix.getA(n - 2) * bModified[n - 2]);
+
+        for (int i = n - 2; i >= 0; i--) {
+            result[i] = dModified[i] - bModified[i] * result[i + 1];
+        }
+        return result;
+    }
+    
     
     private static class ParallelSolver {
         private static final Logger LOGGER = LoggerFactory.getLogger(ParallelSolver.class);
