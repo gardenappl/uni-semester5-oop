@@ -30,9 +30,10 @@ public class ThreadGroupMonitor implements Runnable {
         printWithIndent(level, "---------");
         printWithIndent(level, "Thread: " + thread.getName());
         printWithIndent(level, "---------");
+        if (thread.isDaemon())
+            printWithIndent(level, "Daemon");
         printWithIndent(level, "ID: " + thread.getId());
         printWithIndent(level, "State: " + thread.getState());
-        printWithIndent(level, "Is daemon: " + thread.isDaemon());
     }
     
     private void printTree(int level, ThreadGroup group) {
@@ -41,8 +42,9 @@ public class ThreadGroupMonitor implements Runnable {
         printWithIndent(level, "---------");
         printWithIndent(level, "Group: " + group.getName());
         printWithIndent(level, "---------");
+        if (group.isDaemon())
+            printWithIndent(level, "Daemon");
         printWithIndent(level, "Destroyed: " + group.isDestroyed());
-        printWithIndent(level, "Is daemon: " + group.isDaemon());
         //printWithIndent(level, "Est. active threads: " + estThreadCount);
         //printWithIndent(level, "Est. active groups: " + estGroupCount);
         printWithIndent(level, "Max. priority: " + group.getMaxPriority());

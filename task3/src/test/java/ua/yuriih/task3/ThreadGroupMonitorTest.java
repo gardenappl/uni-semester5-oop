@@ -24,21 +24,26 @@ class ThreadGroupMonitorTest {
     
     @Test
     void run() {
-        ThreadGroup group = new ThreadGroup("root");
-        Thread threadRoot1 = new Thread(group, () -> sleep(3));
+        ThreadGroup groupRoot = new ThreadGroup("root");
+        Thread threadRoot1 = new Thread(groupRoot, () -> sleep(3));
         threadRoot1.start();
-        Thread threadRoot2 = new Thread(group, () -> busyWait(1));
+        Thread threadRoot2 = new Thread(groupRoot, () -> busyWait(1));
         threadRoot2.start();
-        Thread threadRoot3 = new Thread(group, () -> sleep(10000));
+        Thread threadRoot3 = new Thread(groupRoot, () -> sleep(10000));
+        threadRoot3.setDaemon(true);
         threadRoot3.start();
 
-        ThreadGroup group1 = new ThreadGroup(group, "child1");
+        ThreadGroup group1 = new ThreadGroup(groupRoot, "child1");
         Thread thread11 = new Thread(group1, () -> busyWait(3), "child1-1");
         thread11.start();
-        Thread thread21 = new Thread(group1, () -> sleep(1), "child2-2");
+        Thread thread12 = new Thread(group1, () -> sleep(1), "child2-2");
+        thread12.start();
+
+        ThreadGroup group2 = new ThreadGroup(groupRoot, "child2");
+        Thread thread21 = new Thread(group2, () -> busyWait(5));
         thread21.start();
 
-        ThreadGroupMonitor monitor = new ThreadGroupMonitor(System.out, group);
+        ThreadGroupMonitor monitor = new ThreadGroupMonitor(System.out, groupRoot);
         monitor.run();
 
         assertDoesNotThrow(() -> Thread.sleep(2000));
