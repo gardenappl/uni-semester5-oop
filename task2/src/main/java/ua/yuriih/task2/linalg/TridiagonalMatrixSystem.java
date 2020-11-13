@@ -23,6 +23,31 @@ public class TridiagonalMatrixSystem {
         return new ParallelSolver(this).solve();
     }
     
+    public boolean isSolution(double[] x) {
+        return isSolution(x, 0.0001);
+    }
+
+    public boolean isSolution(double[] x, double epsilon) {
+        if (x.length != matrix.getSize())
+            throw new IllegalArgumentException("Array X must have same length as size of matrix");
+        
+        for (int i = 0; i < matrix.getSize(); i++) {
+            double result = 0;
+            if (i != 0) {
+                result += matrix.a[i - 1] * x[i - 1];
+            }
+            result += matrix.c[i] * x[i];
+            if (i != matrix.getSize() - 1) {
+                result += matrix.b[i] * x[i + 1];
+            }
+            System.err.println("r[" + i + "]: " + result);
+            System.err.println("d[" + i + "]: " + d[i]);
+            /*if (Math.abs(result - d[i]) > epsilon)
+                return false;*/
+        }
+        return true;
+    }
+    
     private static class ParallelSolver {
         private static final Logger LOGGER = LoggerFactory.getLogger(ParallelSolver.class);
         
@@ -42,12 +67,12 @@ public class TridiagonalMatrixSystem {
             this.f = system.d;
             n = matrix.getSize();
             mid = n / 2;
-            //Upper: 0 .. mid-1
-            this.upAlpha = new double[mid];
-            this.upBeta = new double[mid];
-            //Lower: mid-1 .. n-1 -> 0 .. n-mid
-            this.downXi = new double[n - mid + 1];
-            this.downEta = new double[n - mid + 1];
+            //Upper: [0 .. mid]
+            this.upAlpha = new double[mid + 1];
+            this.upBeta = new double[mid + 1];
+            //Lower: [mid .. n-1] -> [0 .. n-1-mid]
+            this.downXi = new double[n - mid];
+            this.downEta = new double[n - mid];
         }
         
         double[] solve() {
@@ -55,7 +80,7 @@ public class TridiagonalMatrixSystem {
                 upAlpha[0] = -matrix.b[0] / matrix.c[0];
                 upBeta[0] = f[0] / matrix.c[0];
 
-                for (int i = 1; i <= mid - 1; i++) {
+                for (int i = 1; i <= mid; i++) {
                     double divisor = matrix.c[i] + matrix.a[i - 1] * upAlpha[i - 1];
                     upAlpha[i] = -matrix.b[i] / divisor;
                     upBeta[i] = (f[i] - matrix.a[i - 1] * upBeta[i - 1]) / divisor;
@@ -63,13 +88,13 @@ public class TridiagonalMatrixSystem {
             });
 
             Thread lowerThread = new Thread(() -> {
-                downXi[n - mid] = -matrix.a[n - 2] / matrix.c[n - 1];
-                downEta[n - mid] = f[n - 1] / matrix.c[n - 1];
+                downXi[n - 1 - mid] = -matrix.a[n - 2] / matrix.c[n - 1];
+                downEta[n - 1 - mid] = f[n - 1] / matrix.c[n - 1];
 
-                for (int i = n - 2; i >= mid - 1; i--) {
-                    double divisor = matrix.c[i] + matrix.b[i] * downXi[i - (mid - 1) + 1];
-                    downXi[i - (mid - 1)] = -matrix.a[i - 1] / divisor;
-                    downEta[i - (mid - 1)] = (f[i] - matrix.b[i] * downEta[i - (mid - 1) + 1]) / divisor;
+                for (int i = n - 2; i >= mid; i--) {
+                    double divisor = matrix.c[i] + matrix.b[i] * downXi[i - mid + 1];
+                    downXi[i - mid] = -matrix.a[i - 1] / divisor;
+                    downEta[i - mid] = (f[i] - matrix.b[i] * downEta[i - mid + 1]) / divisor;
                 }
             });
 
@@ -84,18 +109,18 @@ public class TridiagonalMatrixSystem {
             }
 
             double[] result = new double[n];
-            result[mid - 1] = (downEta[0] + downXi[0] * upBeta[0]) / (1 - downXi[0] * upAlpha[mid - 1]);
-            result[mid - 2] = (upBeta[mid - 1] + upAlpha[mid - 1] * downEta[0]) / (1 - downXi[0] * upAlpha[mid - 1]);
+            result[mid + 1] = (downEta[0] + downXi[0] * upBeta[mid]) / (1 - downXi[0] * upAlpha[mid]);
+            result[mid] = (upBeta[mid] + upAlpha[mid] * downEta[0]) / (1 - downXi[0] * upAlpha[mid]);
 
             upperThread = new Thread(() -> {
-                for (int i = mid - 3; i >= 0; i--) {
-                    result[i] = upAlpha[i + 1] * result[i + 1] + upBeta[i + 1];
+                for (int i = mid - 1; i >= 0; i--) {
+                    result[i] = upAlpha[i] * result[i + 1] + upBeta[i];
                 }
             });
             
             lowerThread = new Thread(() -> {
-                for (int i = mid; i < n; i++) {
-                    result[i] = downXi[i - (mid - 1)] * result[i - 1] + downEta[i - (mid - 1)];
+                for (int i = mid + 2; i < n; i++) {
+                    result[i] = downXi[i - mid] * result[i - 1] + downEta[i - mid];
                 }
             });
 

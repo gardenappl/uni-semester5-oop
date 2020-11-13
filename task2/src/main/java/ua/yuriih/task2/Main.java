@@ -1,5 +1,7 @@
 package ua.yuriih.task2;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ua.yuriih.task2.linalg.TridiagonalMatrix;
 import ua.yuriih.task2.linalg.TridiagonalMatrixSystem;
 
@@ -7,6 +9,8 @@ import java.util.Arrays;
 import java.util.Random;
 
 public class Main {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
+    
     private static TridiagonalMatrixSystem getRandomSolvableSystem(int size, double scale) {
         double[] c = new double[size];
         double[] a = new double[size - 1];
@@ -30,6 +34,10 @@ public class Main {
     }
     
     public static void main(String[] args) {
-        System.out.println(Arrays.toString(getRandomSolvableSystem(100, 5).solve()));
+        TridiagonalMatrixSystem system = getRandomSolvableSystem(10, 5);
+        double[] x = system.solve();
+        LOGGER.info(Arrays.toString(x));
+
+        LOGGER.info("Is solution? {}", system.isSolution(x));
     }
 }
