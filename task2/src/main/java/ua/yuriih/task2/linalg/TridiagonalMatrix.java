@@ -1,9 +1,9 @@
 package ua.yuriih.task2.linalg;
 
 public class TridiagonalMatrix {
-    final double[] a;
-    final double[] b;
-    final double[] c;
+    private final double[] a;
+    private final double[] b;
+    private final double[] c;
 
     public TridiagonalMatrix(double[] a, double[] b, double[] c) {
         if (a.length != c.length - 1)

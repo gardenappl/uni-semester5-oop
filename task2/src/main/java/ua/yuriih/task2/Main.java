@@ -20,30 +20,48 @@ public class Main {
         Random rng = new Random();
         for (int i = 0; i < size; i++) {
             if (i != 0) {
-                a[i - 1] = rng.nextDouble() * scale;
+                a[i - 1] = (rng.nextDouble() - 0.5) * scale;
                 c[i] += a[i - 1];
             }
             if (i != size - 1) {
-                b[i] = rng.nextDouble() * scale;
+                b[i] = (rng.nextDouble() - 0.5) * scale;
                 c[i] += b[i];
             }
-            c[i] += rng.nextDouble() * scale;
-            d[i] = rng.nextDouble() * scale;
+            c[i] += (rng.nextDouble() - 0.5) * scale;
+            d[i] = (rng.nextDouble() - 0.5) * scale;
         }
         return new TridiagonalMatrixSystem(new TridiagonalMatrix(a, b, c), d);
     }
     
     public static void main(String[] args) {
-        TridiagonalMatrixSystem system = getRandomSolvableSystem(99, 5);
-//        double[] a = new double[] { 5, -5, 4, 1 };
-//        double[] b = new double[] { -3, 2, 0, -1 };
-//        double[] c = new double[] { 5, 8, 11, 13, -16 };
-//        double[] d = new double[] { 3, -3, 5, -5, 1 };
-//        TridiagonalMatrixSystem system = new TridiagonalMatrixSystem(new TridiagonalMatrix(a, b, c), d);
-//        LOGGER.info(system.toString());
-        double[] x = system.solve();
-//        LOGGER.info(Arrays.toString(x));
+        double[] a = new double[] { 5, -5, 4, 1 };
+        double[] b = new double[] { -3, 2, 0, -1 };
+        double[] c = new double[] { 5, 8, 11, 13, -16 };
+        double[] d = new double[] { 3, -3, 5, -5, 1 };
+        TridiagonalMatrixSystem system = new TridiagonalMatrixSystem(new TridiagonalMatrix(a, b, c), d);
+        LOGGER.info(system.toString());
 
+        double[] x = system.solve();
+        LOGGER.info(Arrays.toString(x));
         LOGGER.info("Is solution? {}", system.isSolution(x));
+
+        x = system.solve(false);
+        LOGGER.info(Arrays.toString(x));
+        LOGGER.info("Is solution? {}", system.isSolution(x));
+
+
+        system = getRandomSolvableSystem(10000, 5);
+        x = system.solve();
+        LOGGER.info("Is solution? {}", system.isSolution(x));
+        x = system.solve(false);
+        LOGGER.info("Is solution? {}", system.isSolution(x));
+
+
+        system = getRandomSolvableSystem(99999, 5);
+        x = system.solve();
+        LOGGER.info("Is solution? {}", system.isSolution(x));
+        x = system.solve(false);
+        LOGGER.info("Is solution? {}", system.isSolution(x));
+
     }
 }
