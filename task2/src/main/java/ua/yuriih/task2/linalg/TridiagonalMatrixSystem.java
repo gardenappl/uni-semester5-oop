@@ -155,22 +155,20 @@ public class TridiagonalMatrixSystem {
                 }
             });
 
-            Thread lowerThread = new Thread(() -> {
-                downXi[n - 1 - mid] = -matrix.getA(n - 2) / matrix.getC(n - 1);
-                downEta[n - 1 - mid] = f[n - 1] / matrix.getC(n - 1);
-
-                for (int i = n - 2; i >= mid; i--) {
-                    double divisor = matrix.getC(i) + matrix.getB(i) * downXi[i - mid + 1];
-                    downXi[i - mid] = -matrix.getA(i - 1) / divisor;
-                    downEta[i - mid] = (f[i] - matrix.getB(i) * downEta[i - mid + 1]) / divisor;
-                }
-            });
-
-            lowerThread.start();
             upperThread.start();
 
+            //Do lower half calculations in this thread
+
+            downXi[n - 1 - mid] = -matrix.getA(n - 2) / matrix.getC(n - 1);
+            downEta[n - 1 - mid] = f[n - 1] / matrix.getC(n - 1);
+
+            for (int i = n - 2; i >= mid; i--) {
+                double divisor = matrix.getC(i) + matrix.getB(i) * downXi[i - mid + 1];
+                downXi[i - mid] = -matrix.getA(i - 1) / divisor;
+                downEta[i - mid] = (f[i] - matrix.getB(i) * downEta[i - mid + 1]) / divisor;
+            }
+
             try {
-                lowerThread.join();
                 upperThread.join();
             } catch (InterruptedException e) {
                 LOGGER.error("Interrupted", e);
@@ -189,19 +187,16 @@ public class TridiagonalMatrixSystem {
                     result[i] = upAlpha[i + 1] * result[i + 1] + upBeta[i + 1];
                 }
             });
-            
-            lowerThread = new Thread(() -> {
-                for (int i = mid + 1; i < n; i++) {
-                    result[i] = downXi[i - mid] * result[i - 1] + downEta[i - mid];
-                }
-            });
 
             upperThread.start();
-            lowerThread.start();
+
+            //lower half
+            for (int i = mid + 1; i < n; i++) {
+                result[i] = downXi[i - mid] * result[i - 1] + downEta[i - mid];
+            }
 
             try {
                 upperThread.join();
-                lowerThread.join();
             } catch (InterruptedException e) {
                 LOGGER.error("Interrupted", e);
             }
