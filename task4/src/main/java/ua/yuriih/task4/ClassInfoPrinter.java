@@ -29,16 +29,16 @@ public class ClassInfoPrinter {
                 .append(Arrays.toString(aClass.getAnnotations()));
         
         for (Field field : aClass.getDeclaredFields())
-            getInfo(sb, field);
+            appendInfo(sb, field);
         for (Constructor constructor : aClass.getDeclaredConstructors())
-            getInfo(sb, constructor);
+            appendInfo(sb, constructor);
         for (Method method : aClass.getDeclaredMethods())
-            getInfo(sb, method);
+            appendInfo(sb, method);
 
         return sb.toString();
     }
     
-    private StringBuilder getInfo(StringBuilder sb, Constructor constructor) {
+    private StringBuilder appendInfo(StringBuilder sb, Constructor constructor) {
         sb.append("\nConstructor: ")
                 .append(Arrays.toString(constructor.getParameterTypes()))
                 .append("\n\tModifiers: ")
@@ -47,7 +47,7 @@ public class ClassInfoPrinter {
         return sb;
     }
 
-    private StringBuilder getInfo(StringBuilder sb, Method method) {
+    private StringBuilder appendInfo(StringBuilder sb, Method method) {
         sb.append("\nMethod: ")
                 .append(method.getName())
                 .append("\n\tReturn type: ")
@@ -60,7 +60,7 @@ public class ClassInfoPrinter {
         return sb;
     }
 
-    private StringBuilder getInfo(StringBuilder sb, Field field) {
+    private StringBuilder appendInfo(StringBuilder sb, Field field) {
         sb.append("\nField: ")
                 .append(field.getName())
                 .append("\n\tType: ")

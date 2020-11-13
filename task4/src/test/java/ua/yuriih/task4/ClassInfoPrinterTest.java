@@ -15,7 +15,6 @@ public class ClassInfoPrinterTest {
 
     @Test
     public void getInfo() {
-        DummyClass dummyObj = new DummyClass(5, "hi", new float[0]);
         ClassInfoPrinter classInfoPrinter = new ClassInfoPrinter();
 
         AtomicReference<String> stringRef = new AtomicReference<>();

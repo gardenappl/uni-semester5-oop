@@ -37,8 +37,10 @@ public class TridiagonalMatrix {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("[\n");
+
         for (int i = 0; i < getSize(); i++) {
             sb.append('[');
+
             for (int j = 0; j < getSize(); j++) {
                 if (j == i - 1)
                     sb.append(a[i - 1]);
@@ -48,11 +50,14 @@ public class TridiagonalMatrix {
                     sb.append(c[i]);
                 else
                     sb.append(0.d);
+
                 if (j != getSize() - 1)
                     sb.append(", ");
             }
+
             sb.append("]\n");
         }
+
         sb.append(']');
         return sb.toString();
     }

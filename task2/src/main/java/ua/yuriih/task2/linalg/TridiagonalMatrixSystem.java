@@ -19,6 +19,10 @@ public class TridiagonalMatrixSystem {
     }
 
     //Creates system with diagonally dominant matrix
+    public static TridiagonalMatrixSystem getRandomSolvableSystem(int size) {
+        return getRandomSolvableSystem(size, 1.d);
+    }
+    
     public static TridiagonalMatrixSystem getRandomSolvableSystem(int size, double scale) {
         double[] c = new double[size];
         double[] a = new double[size - 1];

@@ -62,7 +62,7 @@ class TridiagonalMatrixSystemTest {
 
     void solve_doTest(boolean parallel) {
         for (int i = 0; i < 1000; i++) {
-            TridiagonalMatrixSystem system = TridiagonalMatrixSystem.getRandomSolvableSystem(10 + i, 10 * i);
+            TridiagonalMatrixSystem system = TridiagonalMatrixSystem.getRandomSolvableSystem(10 + i, 1000 * i);
             assert(system.isSolution(system.solve(parallel)));
         }
     }

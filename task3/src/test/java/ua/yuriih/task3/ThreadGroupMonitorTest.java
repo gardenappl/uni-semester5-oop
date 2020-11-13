@@ -12,10 +12,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class ThreadGroupMonitorTest {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ThreadGroupMonitorTest.class);
+    
     private static void sleep(int seconds) {
         try {
             Thread.sleep(seconds * 1000);
@@ -24,7 +28,7 @@ class ThreadGroupMonitorTest {
         }
     }
 
-    private static void busyWait(int seconds) {
+    private static void busyWait(float seconds) {
         long nanoTimeStart = System.nanoTime();
         while (System.nanoTime() - nanoTimeStart < seconds * 1_000_000_000L) {
             //busy wait
@@ -49,7 +53,7 @@ class ThreadGroupMonitorTest {
         thread12.start();
 
         ThreadGroup group2 = new ThreadGroup(groupRoot, "child2");
-        Thread thread21 = new Thread(group2, () -> busyWait(5), "child2-1");
+        Thread thread21 = new Thread(group2, () -> busyWait(1), "child2-1");
         thread21.start();
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -61,6 +65,12 @@ class ThreadGroupMonitorTest {
         
         assertDoesNotThrow(() -> Thread.sleep(500));
 
+        Function<String, String> replaceUnwanted = (String line) -> {
+            if (line.contains("ID: "))
+                return "(not testing IDs)";
+            else
+                return null;
+        };
 
         ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
         assertLinesMatchStream(Arrays.asList(
@@ -72,19 +82,22 @@ class ThreadGroupMonitorTest {
                 " -  ---------",
                 " -  Thread: root1",
                 " -  ---------",
-                " -  ID: 15",
+                "(not testing IDs)",
                 " -  State: TIMED_WAITING",
+                " -  Priority: 5",
                 " -  ---------",
                 " -  Thread: root2",
                 " -  ---------",
-                " -  ID: 16",
+                "(not testing IDs)",
                 " -  State: RUNNABLE",
+                " -  Priority: 5",
                 " -  ---------",
                 " -  Thread: root3",
                 " -  ---------",
                 " -  Daemon",
-                " -  ID: 17",
+                "(not testing IDs)",
                 " -  State: TIMED_WAITING",
+                " -  Priority: 5",
                 " -  ---------",
                 " -  Group: child1",
                 " -  ---------",
@@ -93,13 +106,15 @@ class ThreadGroupMonitorTest {
                 " -   -  ---------",
                 " -   -  Thread: child1-1",
                 " -   -  ---------",
-                " -   -  ID: 18",
+                "(not testing IDs)",
                 " -   -  State: RUNNABLE",
+                " -   -  Priority: 5",
                 " -   -  ---------",
                 " -   -  Thread: child2-2",
                 " -   -  ---------",
-                " -   -  ID: 19",
+                "(not testing IDs)",
                 " -   -  State: TIMED_WAITING",
+                " -   -  Priority: 5",
                 " -  ---------",
                 " -  Group: child2",
                 " -  ---------",
@@ -108,9 +123,10 @@ class ThreadGroupMonitorTest {
                 " -   -  ---------",
                 " -   -  Thread: child2-1",
                 " -   -  ---------",
-                " -   -  ID: 20",
-                " -   -  State: RUNNABLE"
-                ), inputStream);
+                "(not testing IDs)",
+                " -   -  State: RUNNABLE",
+                " -   -  Priority: 5"
+        ), inputStream, replaceUnwanted);
 
         outputStream.reset();
 
@@ -130,14 +146,16 @@ class ThreadGroupMonitorTest {
                 " -  ---------",
                 " -  Thread: root1",
                 " -  ---------",
-                " -  ID: 15",
+                "(not testing IDs)",
                 " -  State: TIMED_WAITING",
+                " -  Priority: 5",
                 " -  ---------",
                 " -  Thread: root3",
                 " -  ---------",
                 " -  Daemon",
-                " -  ID: 17",
+                "(not testing IDs)",
                 " -  State: TIMED_WAITING",
+                " -  Priority: 5",
                 " -  ---------",
                 " -  Group: child1",
                 " -  ---------",
@@ -146,28 +164,32 @@ class ThreadGroupMonitorTest {
                 " -   -  ---------",
                 " -   -  Thread: child1-1",
                 " -   -  ---------",
-                " -   -  ID: 18",
+                "(not testing IDs)",
                 " -   -  State: RUNNABLE",
+                " -   -  Priority: 5",
                 " -  ---------",
                 " -  Group: child2",
                 " -  ---------",
                 " -  Destroyed: false",
-                " -  Max. priority: 10",
-                " -   -  ---------",
-                " -   -  Thread: child2-1",
-                " -   -  ---------",
-                " -   -  ID: 20",
-                " -   -  State: RUNNABLE"
-        ), inputStream);
+                " -  Max. priority: 10"
+        ), inputStream, replaceUnwanted);
     }
 
 
-    private void assertLinesMatchStream(List<String> expectedLines, InputStream stream) {
+    private void assertLinesMatchStream(List<String> expectedLines, 
+                                        InputStream stream,
+                                        Function<String, String> filter) {
         Scanner scanner = new Scanner(stream);
 
         ArrayList<String> inputLines = new ArrayList<>();
         while (scanner.hasNextLine()) {
-            inputLines.add(scanner.nextLine());
+            String line = scanner.nextLine();
+            String filteredLine = filter.apply(line);
+            if (filteredLine != null)
+                inputLines.add(filteredLine);
+            else
+                inputLines.add(line);
+            LOGGER.info(line);
         }
 
         assertLinesMatch(expectedLines, inputLines);
