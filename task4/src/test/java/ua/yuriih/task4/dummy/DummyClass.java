@@ -1,10 +1,14 @@
 package ua.yuriih.task4.dummy;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Arrays;
 import java.util.Objects;
 
+@Deprecated
 public class DummyClass {
     public int dummyInt;
+    @NotNull
     private String dummyString;
     float[] dummyFloatArray;
 
@@ -18,11 +22,12 @@ public class DummyClass {
         this.dummyFloatArray = dummyFloatArray;
     }
 
+    @NotNull
     public String getDummyString() {
         return dummyString;
     }
 
-    public void setDummyString(String dummyString) {
+    public void setDummyString(@NotNull String dummyString) {
         this.dummyString = dummyString;
     }
 
@@ -38,22 +43,5 @@ public class DummyClass {
                 ", dummyString='" + dummyString + '\'' +
                 ", dummyFloatArray=" + Arrays.toString(dummyFloatArray) +
                 '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        DummyClass that = (DummyClass) o;
-        return dummyInt == that.dummyInt &&
-                Objects.equals(dummyString, that.dummyString) &&
-                Arrays.equals(dummyFloatArray, that.dummyFloatArray);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = Objects.hash(dummyInt, dummyString);
-        result = 31 * result + Arrays.hashCode(dummyFloatArray);
-        return result;
     }
 }
