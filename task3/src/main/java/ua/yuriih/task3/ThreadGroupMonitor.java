@@ -1,23 +1,32 @@
 package ua.yuriih.task3;
 
-import java.io.BufferedOutputStream;
-import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.util.Arrays;
 
 public class ThreadGroupMonitor implements Runnable {
-    ThreadGroup threadGroup;
-    PrintStream printStream;
+    private final ThreadGroup threadGroup;
+    private final PrintStream printStream;
+    private final int millisInterval;
 
-    public ThreadGroupMonitor(PrintStream printStream, ThreadGroup threadGroup) {
+    public ThreadGroupMonitor(OutputStream outputStream, ThreadGroup threadGroup, int millisInterval) {
         this.threadGroup = threadGroup;
-        this.printStream = printStream;
+        if (outputStream instanceof PrintStream)
+            this.printStream = (PrintStream)outputStream;
+        else
+            this.printStream = new PrintStream(outputStream);
+        this.millisInterval = millisInterval;
     }
 
     @Override
     public void run() {
-        printTree(0, threadGroup);
+        while (!Thread.currentThread().isInterrupted()) {
+            printTree(0, threadGroup);
+            try {
+                Thread.sleep(millisInterval);
+            } catch (InterruptedException ignored) {
+                return;
+            }
+        }
     }
 
     private void printWithIndent(int level, String s) {
