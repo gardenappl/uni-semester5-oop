@@ -20,8 +20,13 @@ public class ClassInfoPrinterTest {
                 stringRef.set(classInfoPrinter.getInfo("ua.yuriih.task4.dummy.DummyClass"))
         );
         String info = stringRef.get();
+
+        LOGGER.info(info);
+
         assert(info.contains(
                 "Canonical name: ua.yuriih.task4.dummy.DummyClass\n" +
+                "Superclass: class java.lang.Object\n" +
+                "Interfaces: [interface java.io.Serializable]\n" +
                 "Modifiers: public\n" +
                 "Annotations: [@java.lang.Deprecated(forRemoval=false, since=\"\")]\n"
         ));
