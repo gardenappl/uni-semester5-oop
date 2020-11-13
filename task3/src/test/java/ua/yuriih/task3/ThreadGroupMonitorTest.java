@@ -161,7 +161,7 @@ class ThreadGroupMonitorTest {
         ), inputStream);
     }
 
-    
+
     private void assertLinesMatchStream(List<String> expectedLines, InputStream stream) {
         Scanner scanner = new Scanner(stream);
 
