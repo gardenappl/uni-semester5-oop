@@ -12,7 +12,7 @@ class CustomClassLoaderTest {
 
         final String dummyClassName = "ua.yuriih.task4.dummy.DummyClass";
         assertDoesNotThrow(() ->
-                assertEquals(DummyClass.class, customClassLoader.findClass(dummyClassName))
+                assertEquals("DummyClass", customClassLoader.findClass(dummyClassName).getSimpleName())
         );
         assertThrows(ClassNotFoundException.class, () ->
                 customClassLoader.findClass("ua.yuriih.task4.NonExistentClass")

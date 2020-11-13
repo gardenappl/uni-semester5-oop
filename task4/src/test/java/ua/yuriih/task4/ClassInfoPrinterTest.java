@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ua.yuriih.task4.dummy.*;
+
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -13,6 +15,7 @@ public class ClassInfoPrinterTest {
 
     @Test
     public void getInfo() {
+        DummyClass dummyObj = new DummyClass(5, "hi", new float[0]);
         ClassInfoPrinter classInfoPrinter = new ClassInfoPrinter();
 
         AtomicReference<String> stringRef = new AtomicReference<>();

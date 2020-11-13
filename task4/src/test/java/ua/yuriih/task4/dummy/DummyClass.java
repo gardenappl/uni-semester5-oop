@@ -1,7 +1,5 @@
 package ua.yuriih.task4.dummy;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
@@ -9,7 +7,6 @@ import java.util.Objects;
 @Deprecated
 public class DummyClass implements Serializable {
     public int dummyInt;
-    @NotNull
     private String dummyString;
     float[] dummyFloatArray;
 
@@ -23,12 +20,11 @@ public class DummyClass implements Serializable {
         this.dummyFloatArray = dummyFloatArray;
     }
 
-    @NotNull
     public String getDummyString() {
         return dummyString;
     }
 
-    public void setDummyString(@NotNull String dummyString) {
+    public void setDummyString(String dummyString) {
         this.dummyString = dummyString;
     }
 
