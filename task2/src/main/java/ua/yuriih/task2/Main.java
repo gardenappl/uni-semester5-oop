@@ -34,9 +34,15 @@ public class Main {
     }
     
     public static void main(String[] args) {
-        TridiagonalMatrixSystem system = getRandomSolvableSystem(10, 5);
+        TridiagonalMatrixSystem system = getRandomSolvableSystem(99, 5);
+//        double[] a = new double[] { 5, -5, 4, 1 };
+//        double[] b = new double[] { -3, 2, 0, -1 };
+//        double[] c = new double[] { 5, 8, 11, 13, -16 };
+//        double[] d = new double[] { 3, -3, 5, -5, 1 };
+//        TridiagonalMatrixSystem system = new TridiagonalMatrixSystem(new TridiagonalMatrix(a, b, c), d);
+//        LOGGER.info(system.toString());
         double[] x = system.solve();
-        LOGGER.info(Arrays.toString(x));
+//        LOGGER.info(Arrays.toString(x));
 
         LOGGER.info("Is solution? {}", system.isSolution(x));
     }

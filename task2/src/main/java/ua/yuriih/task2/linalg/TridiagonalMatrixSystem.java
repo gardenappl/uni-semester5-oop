@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ua.yuriih.task2.linalg.TridiagonalMatrix;
 
+import java.util.Arrays;
+
 public class TridiagonalMatrixSystem {
     final TridiagonalMatrix matrix;
     final double[] d;
@@ -17,6 +19,11 @@ public class TridiagonalMatrixSystem {
 
     public TridiagonalMatrix getMatrix() {
         return matrix;
+    }
+    
+    @Override
+    public String toString() {
+        return matrix.toString() + ", d = " + Arrays.toString(d);
     }
     
     public double[] solve() {
@@ -40,10 +47,10 @@ public class TridiagonalMatrixSystem {
             if (i != matrix.getSize() - 1) {
                 result += matrix.b[i] * x[i + 1];
             }
-            System.err.println("r[" + i + "]: " + result);
-            System.err.println("d[" + i + "]: " + d[i]);
-            /*if (Math.abs(result - d[i]) > epsilon)
-                return false;*/
+            /*System.err.println("r[" + i + "]: " + result);
+            System.err.println("d[" + i + "]: " + d[i]);*/
+            if (Math.abs(result - d[i]) > epsilon)
+                return false;
         }
         return true;
     }
@@ -77,13 +84,13 @@ public class TridiagonalMatrixSystem {
         
         double[] solve() {
             Thread upperThread = new Thread(() -> {
-                upAlpha[0] = -matrix.b[0] / matrix.c[0];
-                upBeta[0] = f[0] / matrix.c[0];
+                upAlpha[1] = -matrix.b[0] / matrix.c[0];
+                upBeta[1] = f[0] / matrix.c[0];
 
-                for (int i = 1; i <= mid; i++) {
-                    double divisor = matrix.c[i] + matrix.a[i - 1] * upAlpha[i - 1];
-                    upAlpha[i] = -matrix.b[i] / divisor;
-                    upBeta[i] = (f[i] - matrix.a[i - 1] * upBeta[i - 1]) / divisor;
+                for (int i = 1; i < mid; i++) {
+                    double divisor = matrix.c[i] + matrix.a[i - 1] * upAlpha[i];
+                    upAlpha[i + 1] = -matrix.b[i] / divisor;
+                    upBeta[i + 1] = (f[i] - matrix.a[i - 1] * upBeta[i]) / divisor;
                 }
             });
 
@@ -109,17 +116,17 @@ public class TridiagonalMatrixSystem {
             }
 
             double[] result = new double[n];
-            result[mid + 1] = (downEta[0] + downXi[0] * upBeta[mid]) / (1 - downXi[0] * upAlpha[mid]);
-            result[mid] = (upBeta[mid] + upAlpha[mid] * downEta[0]) / (1 - downXi[0] * upAlpha[mid]);
+            result[mid] = (downEta[0] + downXi[0] * upBeta[mid]) / (1 - downXi[0] * upAlpha[mid]);
+            result[mid - 1] = (upBeta[mid] + upAlpha[mid] * downEta[0]) / (1 - downXi[0] * upAlpha[mid]);
 
             upperThread = new Thread(() -> {
-                for (int i = mid - 1; i >= 0; i--) {
-                    result[i] = upAlpha[i] * result[i + 1] + upBeta[i];
+                for (int i = mid - 2; i >= 0; i--) {
+                    result[i] = upAlpha[i + 1] * result[i + 1] + upBeta[i + 1];
                 }
             });
             
             lowerThread = new Thread(() -> {
-                for (int i = mid + 2; i < n; i++) {
+                for (int i = mid + 1; i < n; i++) {
                     result[i] = downXi[i - mid] * result[i - 1] + downEta[i - mid];
                 }
             });
