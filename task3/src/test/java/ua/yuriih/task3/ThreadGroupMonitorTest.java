@@ -65,13 +65,6 @@ class ThreadGroupMonitorTest {
         
         assertDoesNotThrow(() -> Thread.sleep(500));
 
-        Function<String, String> replaceUnwanted = (String line) -> {
-            if (line.contains("ID: "))
-                return "(not testing IDs)";
-            else
-                return null;
-        };
-
         ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
         assertLinesMatchStream(Arrays.asList(
                 "---------",
@@ -82,20 +75,20 @@ class ThreadGroupMonitorTest {
                 " -  ---------",
                 " -  Thread: root1",
                 " -  ---------",
-                "(not testing IDs)",
+                " -  ID: [\\d]+",
                 " -  State: TIMED_WAITING",
                 " -  Priority: 5",
                 " -  ---------",
                 " -  Thread: root2",
                 " -  ---------",
-                "(not testing IDs)",
+                " -  ID: [\\d]+",
                 " -  State: RUNNABLE",
                 " -  Priority: 5",
                 " -  ---------",
                 " -  Thread: root3",
                 " -  ---------",
                 " -  Daemon",
-                "(not testing IDs)",
+                " -  ID: [\\d]+",
                 " -  State: TIMED_WAITING",
                 " -  Priority: 5",
                 " -  ---------",
@@ -106,13 +99,13 @@ class ThreadGroupMonitorTest {
                 " -   -  ---------",
                 " -   -  Thread: child1-1",
                 " -   -  ---------",
-                "(not testing IDs)",
+                " -   -  ID: [\\d]+",
                 " -   -  State: RUNNABLE",
                 " -   -  Priority: 5",
                 " -   -  ---------",
                 " -   -  Thread: child2-2",
                 " -   -  ---------",
-                "(not testing IDs)",
+                " -   -  ID: [\\d]+",
                 " -   -  State: TIMED_WAITING",
                 " -   -  Priority: 5",
                 " -  ---------",
@@ -123,10 +116,10 @@ class ThreadGroupMonitorTest {
                 " -   -  ---------",
                 " -   -  Thread: child2-1",
                 " -   -  ---------",
-                "(not testing IDs)",
+                " -   -  ID: [\\d]+",
                 " -   -  State: RUNNABLE",
                 " -   -  Priority: 5"
-        ), inputStream, replaceUnwanted);
+        ), inputStream);
 
         outputStream.reset();
 
@@ -146,14 +139,14 @@ class ThreadGroupMonitorTest {
                 " -  ---------",
                 " -  Thread: root1",
                 " -  ---------",
-                "(not testing IDs)",
+                " -  ID: [\\d]+",
                 " -  State: TIMED_WAITING",
                 " -  Priority: 5",
                 " -  ---------",
                 " -  Thread: root3",
                 " -  ---------",
                 " -  Daemon",
-                "(not testing IDs)",
+                " -  ID: [\\d]+",
                 " -  State: TIMED_WAITING",
                 " -  Priority: 5",
                 " -  ---------",
@@ -164,7 +157,7 @@ class ThreadGroupMonitorTest {
                 " -   -  ---------",
                 " -   -  Thread: child1-1",
                 " -   -  ---------",
-                "(not testing IDs)",
+                " -   -  ID: [\\d]+",
                 " -   -  State: RUNNABLE",
                 " -   -  Priority: 5",
                 " -  ---------",
@@ -172,25 +165,18 @@ class ThreadGroupMonitorTest {
                 " -  ---------",
                 " -  Destroyed: false",
                 " -  Max. priority: 10"
-        ), inputStream, replaceUnwanted);
+        ), inputStream);
     }
 
 
-    private void assertLinesMatchStream(List<String> expectedLines, 
-                                        InputStream stream,
-                                        Function<String, String> filter) {
+    private void assertLinesMatchStream(List<String> expectedLines,
+                                        InputStream stream) {
         Scanner scanner = new Scanner(stream);
 
         ArrayList<String> inputLines = new ArrayList<>();
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
-            String filteredLine = filter.apply(line);
-
-            if (filteredLine != null)
-                inputLines.add(filteredLine);
-            else
-                inputLines.add(line);
-
+            inputLines.add(line);
             LOGGER.info(line);
         }
 
