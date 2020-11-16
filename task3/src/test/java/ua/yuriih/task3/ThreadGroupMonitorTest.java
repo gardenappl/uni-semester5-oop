@@ -185,10 +185,12 @@ class ThreadGroupMonitorTest {
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
             String filteredLine = filter.apply(line);
+
             if (filteredLine != null)
                 inputLines.add(filteredLine);
             else
                 inputLines.add(line);
+
             LOGGER.info(line);
         }
 
