@@ -1,5 +1,7 @@
 package ua.yuriih.task5;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicMarkableReference;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -8,6 +10,7 @@ public class LockFreeSkipList<T> {
         final T keyObject;
         final long key;
         final AtomicMarkableReference<Node<T>>[] nexts;
+        final int height;
         
         public Node(T keyObject, int height) {
             this(keyObject, keyObject.hashCode(), height);
@@ -23,12 +26,12 @@ public class LockFreeSkipList<T> {
             this.nexts = new AtomicMarkableReference[height];
             for (int i = 0; i < height; i++)
                 this.nexts[i] = new AtomicMarkableReference<>(null, false);
+            this.height = height;
         }
     }
 
     
-    
-    private static final int NOT_FOUND = -1;
+
     private final int levels;
     private final Node<T> first;
     private final Node<T> last;
@@ -45,45 +48,67 @@ public class LockFreeSkipList<T> {
         }
     }
     
-    private int find(T element, Node<T>[] predecessors, Node<T>[] successors) {
-        Node<T> newNode = new Node<>(element, levels);
+    private boolean find(T element, Node<T>[] predecessors, Node<T>[] successors) {
+        Boolean result = null;
+        while (result == null) {
+            result = tryFind(element, predecessors, successors);
+        }
+        return result;
+    }
+    
+    private Boolean tryFind(T element, Node<T>[] predecessors, Node<T>[] successors) {
         int key = element.hashCode();
 
-        int levelFound = -1;
+        boolean found = false;
         Node<T> previous = first;
+        boolean[] currentMarked = new boolean[1];
 
-        //search for place to insert, starting from top level
-        for (int level = levels - 1; level >= 0; level--) {
-            Node<T> current = previous.nexts[level].getReference();
-            while (key > current.key) {
-                previous = current;
-                current = previous.nexts[level].getReference();
-            }
-            //TODO: unlink marked nodes
+        //Search for place to insert, starting from top level
+        for (int i = levels - 1; i >= 0; i--) {
+            Node<T> current = previous.nexts[i].getReference();
             
-            if (levelFound == -1 && current.key == key) {
-                //found element; don't stop, populate predecessors and successors
-                levelFound = level;
+            while (true) {
+                //if node marked for deletion, delete it and restart
+                Node<T> next = current.nexts[i].get(currentMarked);
+                if (currentMarked[0]) {
+                    previous.nexts[i].compareAndSet(current, next, false, false);
+                    return null;
+                }
+                
+                if (key > current.key) {
+                    previous = current;
+                    current = previous.nexts[i].getReference();
+                } else {
+                    break;
+                }
+            }
+            
+            if (current.key == key) {
+                //Found element; don't stop, populate predecessors and successors
+                found = true;
             }
 
-            predecessors[level] = previous;
-            successors[level] = current;
+            predecessors[i] = previous;
+            successors[i] = current;
         }
-        return levelFound;
+        return found;
     }
 
     //TODO: more efficient search method
     public boolean contains(T element) {
+        if (element == null)
+            return false;
         Node<T>[] preds = new Node[levels];
         Node<T>[] succs = new Node[levels];
-        return find(element, preds, succs) != NOT_FOUND;
+        
+        return find(element, preds, succs);
     }
     
     private int getHeightForNewNode() {
         return 1 + (int)(Math.random() * levels);
     }
     
-    public boolean insert(T element) {
+    public boolean add(T element) {
         int newNodeHeight = getHeightForNewNode();
 
         Node<T>[] predecessors = new Node[levels];
@@ -91,32 +116,57 @@ public class LockFreeSkipList<T> {
 
         //keep retrying if another element had been inserted here
         while (true) {
-            int levelFound = find(element, predecessors, successors);
-            if (levelFound != NOT_FOUND)
+            if(find(element, predecessors, successors))
                 return false;
 
             //create new node
             Node<T> newNode = new Node<>(element, newNodeHeight);
-            for (int level = 0; level < newNodeHeight; level++) {
-                newNode.nexts[level].set(successors[level], false);
+            for (int i = 0; i < newNodeHeight; i++) {
+                newNode.nexts[i].set(successors[i], false);
             }
             Node<T> predecessor = predecessors[0];
             Node<T> successor = successors[0];
 
             //insert at main level
-            if (!predecessor.nexts[0].compareAndSet(successor, newNode, false, false))
+            if (!predecessor.nexts[0].compareAndSet(successor, newNode,
+                    false, false)) {
                 continue;
+            }
 
-            //insert references at higher levels
-            for (int level = 1; level < newNodeHeight; level++) {
+            //insert references at higher levels (bottom-up)
+            for (int i = 1; i < newNodeHeight; i++) {
                 while (true) {
-                    if (predecessors[level].nexts[level].compareAndSet(successors[level],
+                    if (predecessors[i].nexts[i].compareAndSet(successors[i],
                             newNode, false, false)) {
                         break;
                     } else {
                         //predecessor array is invalid, re-create
                         find(element, predecessors, successors);
                     }
+                }
+            }
+            return true;
+        }
+    }
+
+    public boolean remove(T element) {
+        Node<T>[] predecessors = new Node[levels];
+        Node<T>[] successors = new Node[levels];
+
+        boolean[] isMarked = new boolean[1];
+
+        //keep retrying if another element had been removed here
+        while (true) {
+            if(!find(element, predecessors, successors))
+                return false;
+
+            //mark for deletion (from top to bottom)
+            Node<T> removedNode = successors[0];
+            for (int i = removedNode.height - 1; i >= 0; i--) {
+                Node<T> next = removedNode.nexts[i].get(isMarked);
+                while (!isMarked[0]) {
+                    removedNode.nexts[i].attemptMark(next, true);
+                    next = removedNode.nexts[i].get(isMarked);
                 }
             }
             return true;
