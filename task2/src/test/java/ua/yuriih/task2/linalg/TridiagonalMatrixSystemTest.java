@@ -27,7 +27,7 @@ class TridiagonalMatrixSystemTest {
             if (i != matrix.getSize() - 1)
                 othersSum += Math.abs(matrix.getB(i));
 
-            assert(Math.abs(matrix.getC(i)) >= othersSum);
+            assertTrue(Math.abs(matrix.getC(i)) >= othersSum);
         }
     }
 
@@ -41,13 +41,13 @@ class TridiagonalMatrixSystemTest {
         
         double[] x = new double[] { 0.25191, -0.58015, 0.19084, -0.45031, -0.09064 };
         
-        assert(system.isSolution(x, 0.001));
-        assert(system.isSolution(x));
+        assertTrue(system.isSolution(x, 0.001));
+        assertTrue(system.isSolution(x));
 
         assertFalse(system.isSolution(x, 0.0000001d));
         x[0] = 1;
         assertFalse(system.isSolution(x));
-        assert(system.isSolution(x, 10));
+        assertTrue(system.isSolution(x, 10));
     }
 
     @Test
@@ -63,7 +63,7 @@ class TridiagonalMatrixSystemTest {
     void solve_doTest(boolean parallel) {
         for (int i = 0; i < 1000; i++) {
             TridiagonalMatrixSystem system = TridiagonalMatrixSystem.getRandomSolvableSystem(10 + i, 1000 * i);
-            assert(system.isSolution(system.solve(parallel)));
+            assertTrue(system.isSolution(system.solve(parallel)));
         }
     }
 }
