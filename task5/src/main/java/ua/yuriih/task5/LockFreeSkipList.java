@@ -110,7 +110,7 @@ public class LockFreeSkipList<T> {
             //insert references at higher levels
             for (int level = 1; level < newNodeHeight; level++) {
                 while (true) {
-                    if (predecessor.nexts[level].compareAndSet(successors[level],
+                    if (predecessors[level].nexts[level].compareAndSet(successors[level],
                             newNode, false, false)) {
                         break;
                     } else {
