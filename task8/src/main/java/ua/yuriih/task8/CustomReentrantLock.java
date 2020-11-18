@@ -13,26 +13,19 @@ public class CustomReentrantLock implements Lock {
     
     @Override
     public void lock() {
-        long currentId = Thread.currentThread().getId();
-        if (ownerThreadId == currentId) {
-            holdCount++;
-            return;
+        try {
+            doLock(true, 0);
+        } catch (InterruptedException e) {
+            throw new RuntimeException("This method should never throw an InterruptedException", e);
         }
-        
-        while (ownerThreadId != NOT_OWNED) {
-            try {
-                synchronized (lock) {
-                    lock.wait();
-                }
-            } catch (InterruptedException ignored) {}
-        }
-        ownerThreadId = currentId;
-        holdCount++;
     }
 
     @Override
     public void lockInterruptibly() throws InterruptedException {
+        if (Thread.currentThread().isInterrupted())
+            throw new InterruptedException();
 
+        doLock(false, 0);
     }
 
     @Override
@@ -46,12 +39,54 @@ public class CustomReentrantLock implements Lock {
     }
 
     @Override
-    public boolean tryLock(long l, TimeUnit timeUnit) throws InterruptedException {
-        return false;
+    public boolean tryLock(long timeout, TimeUnit timeUnit) throws InterruptedException {
+        return doLock(false, timeUnit.toNanos(timeout));
     }
+
+    private boolean doLock(boolean ignoreInterrupts, long timeoutNanos) throws InterruptedException {
+        long currentId = Thread.currentThread().getId();
+        if (ownerThreadId == currentId) {
+            holdCount++;
+            return true;
+        }
+
+        long endNanos = 0;
+        if (timeoutNanos != 0)
+            endNanos = System.nanoTime() + timeoutNanos;
+
+        while (ownerThreadId != NOT_OWNED) {
+            long millis = 0;
+            int nanos = 0;
+            
+            if (timeoutNanos != 0) {
+                long startNanos = System.nanoTime();
+                if (endNanos > startNanos) {
+                    millis = (endNanos - startNanos) / 1_000_000L;
+                    nanos = (int) ((endNanos - startNanos) % 1_000_000L);
+                } else {
+                    return false;
+                }
+            }
+
+            try {
+                synchronized (lock) {
+                    lock.wait(millis, nanos);
+                }
+            } catch (InterruptedException e) {
+                if (!ignoreInterrupts)
+                    throw e;
+            }
+        }
+        ownerThreadId = currentId;
+        holdCount++;
+        return true;
+    }
+
 
     @Override
     public void unlock() {
+        if (ownerThreadId != Thread.currentThread().getId())
+            throw new IllegalMonitorStateException("Current thread does not hold this lock.");
         holdCount--;
         
         if (holdCount == 0) {
