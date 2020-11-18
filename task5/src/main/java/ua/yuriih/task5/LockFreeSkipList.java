@@ -94,13 +94,12 @@ public class LockFreeSkipList<T> {
         return found;
     }
 
-    //TODO: more efficient search method
     public boolean contains(T element) {
         if (element == null)
             return false;
         Node<T>[] preds = new Node[levels];
         Node<T>[] succs = new Node[levels];
-        
+
         return find(element, preds, succs);
     }
     

@@ -24,7 +24,7 @@ class SerializationClientTest {
     }
 
     @Test
-    void tryRead_fail() {
+    void tryRead_wrongType() {
         String notExampleObject = "Not an ExampleObject instance, this should crash";
 
         assertThrows(ClassCastException.class, () -> 
