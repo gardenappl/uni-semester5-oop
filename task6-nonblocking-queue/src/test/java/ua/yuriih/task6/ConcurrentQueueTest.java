@@ -3,6 +3,10 @@ package ua.yuriih.task6;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -31,7 +35,7 @@ class ConcurrentQueueTest {
     }
 
     @Test
-    void enqueue_multiThread() {
+    void enqueue_multiThread() throws InterruptedException {
         ConcurrentQueue<Integer> queue = new ConcurrentQueue<>();
 
         //insert numbers from 3 threads
@@ -53,9 +57,9 @@ class ConcurrentQueueTest {
         thread2.start();
         thread3.start();
 
-        assertDoesNotThrow(() -> thread1.join());
-        assertDoesNotThrow(() -> thread2.join());
-        assertDoesNotThrow(() -> thread3.join());
+        thread1.join();
+        thread2.join();
+        thread3.join();
 
         Set<Integer> resultSet = new HashSet<>();
         Integer result;
@@ -83,21 +87,20 @@ class ConcurrentQueueTest {
             queue.enqueue(i);
 
         //insert and remove numbers from 2 threads
+        ExecutorService service = Executors.newFixedThreadPool(2);
 
-        Thread thread1 = new Thread(() -> assertDoesNotThrow(() -> {
+        Future<?> future1 = service.submit(() -> assertDoesNotThrow(() -> {
             for (int i = 0; i < TEST_LENGTH; i++)
                 assertEquals(i, queue.dequeue());
         }));
-        Thread thread2 = new Thread(() -> assertDoesNotThrow(() -> {
+        Future<?> future2 = service.submit(() -> assertDoesNotThrow(() -> {
             for (int i = TEST_LENGTH; i < TEST_LENGTH * 2; i++)
                 queue.enqueue(i);
         }));
 
-        thread1.start();
-        thread2.start();
-
-        assertDoesNotThrow(() -> thread1.join());
-        assertDoesNotThrow(() -> thread2.join());
+        //join
+        assertDoesNotThrow(() -> future1.get());
+        assertDoesNotThrow(() -> future2.get());
 
         for (int i = TEST_LENGTH; i < TEST_LENGTH * 2; i++) {
             assertEquals(i, queue.dequeue());
