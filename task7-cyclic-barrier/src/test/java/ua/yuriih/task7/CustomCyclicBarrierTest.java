@@ -4,7 +4,12 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.font.TextHitInfo;
+import java.nio.charset.IllegalCharsetNameException;
 import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -20,19 +25,21 @@ class CustomCyclicBarrierTest {
 
         assertEquals(0, barrier.getNumberWaiting());
 
-        Thread thread1 = new Thread(() -> {
+
+        ExecutorService service = Executors.newSingleThreadExecutor();
+
+        Future<?> future = service.submit(() -> {
             assertDoesNotThrow(() -> barrier.await());
-        }, "thread2");
+        });
 
-        thread1.start();
 
-        assertDoesNotThrow(() -> Thread.sleep(1000));
+        Thread.sleep(1000);
         
         assertThrows(RuntimeException.class, () ->
                 barrier.await(), "Error in barrier action");
-        
 
-        thread1.join();
+        //join thread
+        assertDoesNotThrow(() -> future.get());
 
         assertEquals(0, barrier.getNumberWaiting());
         assertFalse(barrier.isBroken());
@@ -45,17 +52,16 @@ class CustomCyclicBarrierTest {
         assertEquals(0, barrier.getNumberWaiting());
 
 
-        Thread thread1 = new Thread(() -> {
+        ExecutorService service = Executors.newFixedThreadPool(2);
+
+        Future<?> future1 = service.submit(() -> {
             assertDoesNotThrow(() -> Thread.sleep(2000));
             assertDoesNotThrow(() -> barrier.await());
         });
-        Thread thread2 = new Thread(() -> {
+        Future<?> future2 = service.submit(() -> {
             assertDoesNotThrow(() -> Thread.sleep(1000));
             assertDoesNotThrow(() -> barrier.await());
         });
-
-        thread1.start();
-        thread2.start();
 
 
         assertEquals(0, barrier.getNumberWaiting());
@@ -71,9 +77,10 @@ class CustomCyclicBarrierTest {
             assertEquals(0, barrier.await())
         );
 
+        //join threads
+        assertDoesNotThrow(() -> future1.get());
+        assertDoesNotThrow(() -> future2.get());
 
-        thread1.join();
-        thread2.join();
 
         assertEquals(0, barrier.getNumberWaiting());
     }
@@ -85,19 +92,18 @@ class CustomCyclicBarrierTest {
         assertEquals(0, barrier.getNumberWaiting());
 
 
-        Thread thread1 = new Thread(() -> {
+        ExecutorService service = Executors.newFixedThreadPool(2);
+
+        Future<?> future1 = service.submit(() -> {
             assertDoesNotThrow(() -> Thread.sleep(2000));
             assertThrows(BrokenBarrierException.class, () ->
                     barrier.await());
         });
-        Thread thread2 = new Thread(() -> {
+        Future<?> future2 = service.submit(() -> {
             assertDoesNotThrow(() -> Thread.sleep(1000));
             assertThrows(BrokenBarrierException.class, () ->
                     barrier.await());
         });
-
-        thread1.start();
-        thread2.start();
 
 
         assertEquals(0, barrier.getNumberWaiting());
@@ -106,8 +112,9 @@ class CustomCyclicBarrierTest {
         assertEquals(1, barrier.getNumberWaiting());
         barrier.reset();
 
-        thread1.join();
-        thread2.join();
+        //join threads
+        assertDoesNotThrow(() -> future1.get());
+        assertDoesNotThrow(() -> future2.get());
 
 
         assertTrue(barrier.isBroken());
@@ -121,30 +128,27 @@ class CustomCyclicBarrierTest {
         assertEquals(0, barrier.getNumberWaiting());
 
 
-        Thread thread1 = new Thread(() -> {
+        Thread mainThread = Thread.currentThread();
+        ExecutorService service = Executors.newFixedThreadPool(2);
+
+        Future<?> future1 = service.submit(() -> {
+            assertDoesNotThrow(() -> Thread.sleep(1000));
+            mainThread.interrupt();
+        });
+
+        Future<?> future2 = service.submit(() -> {
             assertDoesNotThrow(() -> Thread.sleep(2000));
             assertThrows(BrokenBarrierException.class, () ->
                     barrier.await());
         });
-        Thread thread2 = new Thread(() -> {
-            assertDoesNotThrow(() -> Thread.sleep(1000));
-            assertThrows(InterruptedException.class, () ->
-                    barrier.await());
-        });
 
-        thread1.start();
-        thread2.start();
+        assertThrows(InterruptedException.class, () ->
+                barrier.await());
 
 
-        assertEquals(0, barrier.getNumberWaiting());
-
-        Thread.sleep(1500);
-        assertEquals(1, barrier.getNumberWaiting());
-        thread2.interrupt();
-
-        thread1.join();
-        thread2.join();
-
+        //join threads
+        assertDoesNotThrow(() -> future1.get());
+        assertDoesNotThrow(() -> future2.get());
 
         assertTrue(barrier.isBroken());
         assertEquals(0, barrier.getNumberWaiting());
