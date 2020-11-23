@@ -7,7 +7,7 @@ repositories {
     jcenter()
 }
 
-group 'ua.yuriih'
+group 'ua.yuriih.task1'
 
 dependencies {
     implementation project(':myobjlib')
@@ -22,5 +22,5 @@ test {
 }
 
 application {
-    mainClassName = 'ua.yuriih.task1.SerializationClient'
+    mainClassName = 'ua.yuriih.task1.Main'
 }
