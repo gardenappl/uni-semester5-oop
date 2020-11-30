@@ -3,6 +3,7 @@ package ua.yuriih.task10;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -70,7 +71,6 @@ class CustomFixedThreadPoolTest {
         assertEquals(0, threadPool.getQueueSize());
 
         for (int i = 0; i < TASK_COUNT; i++) {
-            final int iFinal = i;
             threadPool.execute(() -> {
                 assertDoesNotThrow(() -> Thread.sleep(100));
             });
@@ -80,5 +80,67 @@ class CustomFixedThreadPoolTest {
         assertEquals(1, threadPool.getQueueSize());
         Thread.sleep(150);
         assertEquals(0, threadPool.getQueueSize());
+    }
+
+    @Test
+    void shutdown() throws InterruptedException {
+        //2 threads
+        CustomFixedThreadPool threadPool = new CustomFixedThreadPool(2);
+
+        //Schedule 2 long tasks
+        int[] tasksComplete = new int[2];
+        for (int i = 0; i < tasksComplete.length; i++) {
+            int iFinal = i;
+            threadPool.execute(() -> {
+                assertDoesNotThrow(() -> Thread.sleep(100));
+                tasksComplete[iFinal]++;
+            });
+        }
+
+        threadPool.shutdown();
+
+        //Try scheduling another task
+        threadPool.execute(() ->
+            assertDoesNotThrow(() -> Thread.sleep(1000))
+        );
+
+        //It should not be queued
+        assertEquals(0, threadPool.getQueueSize());
+
+        //2 tasks should complete
+        Thread.sleep(200);
+        assertEquals(1, tasksComplete[0]);
+        assertEquals(1, tasksComplete[1]);
+    }
+
+
+    @Test
+    void shutdownNow() throws InterruptedException {
+        //2 threads
+        CustomFixedThreadPool threadPool = new CustomFixedThreadPool(2);
+
+        //Schedule 2 interruptible tasks
+        int[] tasksComplete = new int[2];
+        for (int i = 0; i < tasksComplete.length; i++) {
+            int iFinal = i;
+            threadPool.execute(() -> {
+                assertThrows(InterruptedException.class,
+                        () -> Thread.sleep(100));
+                tasksComplete[iFinal]++;
+            });
+        }
+
+        //Schedule another task
+        threadPool.execute(() ->
+                assertDoesNotThrow(() -> Thread.sleep(1000))
+        );
+
+        List<Runnable> queuedTasks = threadPool.shutdownNow();
+        assertEquals(1, queuedTasks.size());
+
+        //2 tasks should complete (after catching interrupt)
+        Thread.sleep(200);
+        assertEquals(1, tasksComplete[0]);
+        assertEquals(1, tasksComplete[1]);
     }
 }
