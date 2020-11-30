@@ -14,8 +14,12 @@ class CustomReentrantLockTest {
     void tryLock() throws InterruptedException {
         CustomReentrantLock lock = new CustomReentrantLock();
 
+        //Lock and unlock from single thread
+
         assertTrue(lock.tryLock());
         lock.unlock();
+
+        //Lock from another thread
 
         ExecutorService service = Executors.newSingleThreadExecutor();
 
@@ -56,8 +60,9 @@ class CustomReentrantLockTest {
     void lock_interruptibly() {
         CustomReentrantLock lock = new CustomReentrantLock();
 
-
         ExecutorService service = Executors.newSingleThreadExecutor();
+
+        //Interrupt main thread from another thread
 
         Thread mainThread = Thread.currentThread();
 

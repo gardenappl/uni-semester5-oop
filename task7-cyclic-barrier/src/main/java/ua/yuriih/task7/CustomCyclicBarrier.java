@@ -30,10 +30,6 @@ public class CustomCyclicBarrier {
         this.lock = new Object();
     }
     
-    public int getParties() {
-        return parties;
-    }
-    
     public int getNumberWaiting() {
         return parties - arrivalIndex;
     }
@@ -91,6 +87,7 @@ public class CustomCyclicBarrier {
                 if (barrierAction != null)
                     barrierAction.run();
             } catch (Exception e) {
+                isBroken = true;
                 throw e;
             } finally {
                 LOGGER.info("Waking up the others");

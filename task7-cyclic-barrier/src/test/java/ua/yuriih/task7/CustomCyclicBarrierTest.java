@@ -29,11 +29,11 @@ class CustomCyclicBarrierTest {
         ExecutorService service = Executors.newSingleThreadExecutor();
 
         Future<?> future = service.submit(() -> {
-            assertDoesNotThrow(() -> barrier.await());
+            assertThrows(BrokenBarrierException.class, () -> barrier.await());
         });
 
 
-        Thread.sleep(1000);
+        Thread.sleep(100);
         
         assertThrows(RuntimeException.class, () ->
                 barrier.await(), "Error in barrier action");
@@ -42,7 +42,7 @@ class CustomCyclicBarrierTest {
         assertDoesNotThrow(() -> future.get());
 
         assertEquals(0, barrier.getNumberWaiting());
-        assertFalse(barrier.isBroken());
+        assertTrue(barrier.isBroken());
     }
 
     @Test
@@ -122,7 +122,7 @@ class CustomCyclicBarrierTest {
     }
 
     @Test
-    void await_interrupted() throws InterruptedException {
+    void await_interrupted() {
         CustomCyclicBarrier barrier = new CustomCyclicBarrier(3);
 
         assertEquals(0, barrier.getNumberWaiting());
