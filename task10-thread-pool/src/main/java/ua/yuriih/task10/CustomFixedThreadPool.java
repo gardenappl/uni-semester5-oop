@@ -125,9 +125,6 @@ public class CustomFixedThreadPool implements Executor {
             if (isRunning())
                 throw new IllegalStateException("ThreadPoolRunnable already has a Runnable");
 
-            if (threadPool.isShuttingDown)
-                return;
-
             this.currentRunnable = currentRunnable;
             synchronized (this) {
                 this.notify();

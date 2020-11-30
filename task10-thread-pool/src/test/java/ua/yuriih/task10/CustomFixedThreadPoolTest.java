@@ -87,30 +87,44 @@ class CustomFixedThreadPoolTest {
         //2 threads
         CustomFixedThreadPool threadPool = new CustomFixedThreadPool(2);
 
+        int[] tasksComplete = new int[3];
+
         //Schedule 2 long tasks
-        int[] tasksComplete = new int[2];
-        for (int i = 0; i < tasksComplete.length; i++) {
+        for (int i = 0; i < 2; i++) {
             int iFinal = i;
             threadPool.execute(() -> {
-                assertDoesNotThrow(() -> Thread.sleep(100));
+                assertDoesNotThrow(() -> Thread.sleep(200));
                 tasksComplete[iFinal]++;
             });
         }
 
+        //First 2 tasks get a head start
+        Thread.sleep(100);
+
+        //Schedule 3rd task
+        threadPool.execute(() -> {
+            assertDoesNotThrow(() -> Thread.sleep(200));
+            tasksComplete[2]++;
+        });
+        assertEquals(1, threadPool.getQueueSize());
+
+
         threadPool.shutdown();
+
 
         //Try scheduling another task
         threadPool.execute(() ->
-            assertDoesNotThrow(() -> Thread.sleep(1000))
+            assertDoesNotThrow(() -> Thread.sleep(200))
         );
 
         //It should not be queued
-        assertEquals(0, threadPool.getQueueSize());
+        assertEquals(1, threadPool.getQueueSize());
 
-        //2 tasks should complete
-        Thread.sleep(200);
+        //3 tasks should complete
+        Thread.sleep(500);
         assertEquals(1, tasksComplete[0]);
         assertEquals(1, tasksComplete[1]);
+        assertEquals(1, tasksComplete[2]);
     }
 
 
