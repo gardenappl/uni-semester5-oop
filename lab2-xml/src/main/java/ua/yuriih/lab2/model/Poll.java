@@ -14,37 +14,34 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for Type.
+ * <p>Java class for Poll.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * <p>
  * <pre>
- * &lt;simpleType name="Type">
+ * &lt;simpleType name="Poll">
  *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *     &lt;enumeration value="ad"/>
- *     &lt;enumeration value="news"/>
- *     &lt;enumeration value="portal"/>
- *     &lt;enumeration value="mirror"/>
+ *     &lt;enumeration value="anonymous"/>
+ *     &lt;enumeration value="authorized"/>
+ *     &lt;enumeration value="no"/>
  *   &lt;/restriction>
  * &lt;/simpleType>
  * </pre>
  * 
  */
-@XmlType(name = "Type")
+@XmlType(name = "Poll")
 @XmlEnum
-public enum Type {
+public enum Poll {
 
-    @XmlEnumValue("ad")
-    AD("ad"),
-    @XmlEnumValue("news")
-    NEWS("news"),
-    @XmlEnumValue("portal")
-    PORTAL("portal"),
-    @XmlEnumValue("mirror")
-    MIRROR("mirror");
+    @XmlEnumValue("anonymous")
+    ANONYMOUS("anonymous"),
+    @XmlEnumValue("authorized")
+    AUTHORIZED("authorized"),
+    @XmlEnumValue("no")
+    NO("no");
     private final String value;
 
-    Type(String v) {
+    Poll(String v) {
         value = v;
     }
 
@@ -52,8 +49,8 @@ public enum Type {
         return value;
     }
 
-    public static Type fromValue(String v) {
-        for (Type c: Type.values()) {
+    public static Poll fromValue(String v) {
+        for (Poll c: Poll.values()) {
             if (c.value.equals(v)) {
                 return c;
             }

@@ -36,17 +36,18 @@
     <xs:complexType name="Chars">
         <xs:sequence>
             <xs:element name="paid" type="xs:boolean"/>
-            <xs:element name="poll">
-                <xs:simpleType>
-                    <xs:restriction base="xs:string">
-                        <xs:enumeration value="anonymous"/>
-                        <xs:enumeration value="authorized"/>
-                        <xs:enumeration value="no"/>
-                    </xs:restriction>
-                </xs:simpleType>
+            <xs:element name="poll" type="Poll">
             </xs:element>
         </xs:sequence>
     </xs:complexType>
+
+    <xs:simpleType name="Poll">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="anonymous"/>
+            <xs:enumeration value="authorized"/>
+            <xs:enumeration value="no"/>
+        </xs:restriction>
+    </xs:simpleType>
     
     <xs:complexType name="Chars-news">
         <xs:complexContent>

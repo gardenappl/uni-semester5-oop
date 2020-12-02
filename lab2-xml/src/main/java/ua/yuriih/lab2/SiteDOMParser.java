@@ -37,7 +37,7 @@ public class SiteDOMParser extends SiteXMLParser {
         return handler.getSite();
     }
     
-    private void parseElementsRecursive(Node element, SiteHandler handler) {
+    private void parseElementsRecursive(Node element, SiteHandler handler) throws XMLParserException {
         Map<String, String> attributeMap = attributesToMap(element.getAttributes());
         handler.setValue(element.getNodeName(), element.getTextContent(), attributeMap);
         

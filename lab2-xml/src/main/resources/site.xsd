@@ -35,15 +35,16 @@
             <xs:element name="hasEmail" type="xs:boolean" minOccurs="0"/>
             <xs:element name="hasNews" type="xs:boolean" minOccurs="0"/>
             <xs:element name="hasArchives" type="xs:boolean" minOccurs="0"/>
-            <xs:element name="poll">
-                <xs:simpleType>
-                    <xs:restriction base="xs:string">
-                        <xs:enumeration value="anonymous"/>
-                        <xs:enumeration value="authorized"/>
-                        <xs:enumeration value="no"/>
-                    </xs:restriction>
-                </xs:simpleType>
+            <xs:element name="poll" type="Poll">
             </xs:element>
         </xs:sequence>
     </xs:complexType>
+
+    <xs:simpleType name="Poll">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="anonymous"/>
+            <xs:enumeration value="authorized"/>
+            <xs:enumeration value="no"/>
+        </xs:restriction>
+    </xs:simpleType>
 </xs:schema>

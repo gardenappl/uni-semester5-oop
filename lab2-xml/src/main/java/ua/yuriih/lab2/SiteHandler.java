@@ -4,10 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
-import ua.yuriih.lab2.model.ObjectFactory;
-import ua.yuriih.lab2.model.Page;
-import ua.yuriih.lab2.model.Site;
-import ua.yuriih.lab2.model.Type;
+import ua.yuriih.lab2.model.*;
 
 import java.util.Map;
 
@@ -40,7 +37,7 @@ public class SiteHandler {
         return qName.equals(PAGE) || qName.equals(CHARS);
     }
 
-    public void setValue(String qName, String data, Map<String, String> attributeMap) {
+    public void setValue(String qName, String data, Map<String, String> attributeMap) throws XMLParserException {
         switch (qName) {
             case SITE -> { /* no-op */ }
             case PAGE -> {
@@ -61,11 +58,11 @@ public class SiteHandler {
             case HAS_NEWS ->
                     currentPage.getChars().setHasNews(Boolean.parseBoolean(data));
             case POLL ->
-                    currentPage.getChars().setPoll(data);
+                    currentPage.getChars().setPoll(Poll.fromValue(data));
             case PAID ->
                     currentPage.getChars().setPaid(Boolean.parseBoolean(data));
 
-            default -> throw new IllegalArgumentException("Invalid qualified name " + qName);
+            default -> throw new XMLParserException("Invalid qualified name " + qName);
         }
     }
     

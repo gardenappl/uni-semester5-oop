@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<site>
+    <page id="main">
+        <title>Main page</title>
+        <title>Main page 2</title>
+    </page>
+    <page id="main">
+        <title>Main page again</title>
+    </page>
+</site>
