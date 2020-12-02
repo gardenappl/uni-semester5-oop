@@ -2,7 +2,9 @@ package ua.yuriih.lab2;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 import ua.yuriih.lab2.model.Site;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -10,9 +12,8 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
 import java.io.IOException;
-import java.text.ParseException;
-import java.util.IllegalFormatException;
-import java.util.zip.DataFormatException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SiteSAXParser extends SiteXMLParser {
     private static Logger LOGGER = LoggerFactory.getLogger(SiteSAXParser.class);
@@ -23,7 +24,7 @@ public class SiteSAXParser extends SiteXMLParser {
     public Site parseXML(File xmlFile) throws IOException, XMLParserException {
         try {
             SAXParser parser = factory.newSAXParser();
-            SiteHandler handler = new SiteHandler();
+            SiteSAXHandler handler = new SiteSAXHandler();
 
             parser.parse(xmlFile, handler);
             return handler.getCurrentSite();
@@ -31,6 +32,46 @@ public class SiteSAXParser extends SiteXMLParser {
             throw new RuntimeException(e);
         } catch (SAXException e) {
             throw new XMLParserException(e);
+        }
+    }
+
+
+    private static class SiteSAXHandler extends DefaultHandler {
+        private SiteHandler siteHandler;
+        private String currentData;
+
+        @Override
+        public void startDocument() throws SAXException {
+            siteHandler = new SiteHandler();
+        }
+
+        @Override
+        public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+            if (siteHandler.shouldSetAtStart(qName))
+                siteHandler.setValue(qName, null, attributesToMap(attributes));
+        }
+
+        @Override
+        public void characters(char[] ch, int start, int length) throws SAXException {
+            currentData = new String(ch, start, length);
+        }
+
+        @Override
+        public void endElement(String uri, String localName, String qName) throws SAXException {
+            if (!siteHandler.shouldSetAtStart(qName))
+                siteHandler.setValue(qName, currentData, null);
+        }
+
+        public Site getCurrentSite() {
+            return siteHandler.getSite();
+        }
+
+        private Map<String, String> attributesToMap(Attributes attributes) {
+            HashMap<String, String> attributeMap = new HashMap<>(attributes.getLength());
+            for (int i = 0; i < attributes.getLength(); i++) {
+                attributeMap.put(attributes.getQName(i), attributes.getValue(i));
+            }
+            return attributeMap;
         }
     }
 }

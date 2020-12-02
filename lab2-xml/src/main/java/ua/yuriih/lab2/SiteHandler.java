@@ -8,10 +8,12 @@ import ua.yuriih.lab2.model.Page;
 import ua.yuriih.lab2.model.Site;
 import ua.yuriih.lab2.model.Type;
 
-public class SiteHandler extends DefaultHandler {
+import java.util.Map;
+
+public class SiteHandler {
     private static final String PAGE = "page";
     private static final String ID = "id";
-    
+
     private static final String TITLE = "title";
     private static final String TYPE = "type";
     private static final String CHARS = "chars";
@@ -26,51 +28,43 @@ public class SiteHandler extends DefaultHandler {
     private static final ObjectFactory objectFactory = new ObjectFactory();
     private Site currentSite;
     private Page currentPage;
-    private String currentElementData;
 
-    @Override
-    public void startDocument() throws SAXException {
+    public void SiteHandler() {
         currentSite = objectFactory.createSite();
+        currentPage = objectFactory.createPage();
+    }
+    
+    public boolean shouldSetAtStart(String qName) {
+        return qName.equals(PAGE) || qName.equals(CHARS);
     }
 
-    @Override
-    public void startElement(String uri, String localName, String qName,
-                             Attributes attributes) throws SAXException {
-        if (qName.equals(PAGE)) {
-            currentPage = objectFactory.createPage();
-            currentPage.setId(attributes.getValue(ID));
-        }
-    }
-
-    @Override
-    public void characters(char[] ch, int start, int length) throws SAXException {
-        currentElementData = new String(ch, start, length);
-    }
-
-    @Override
-    public void endElement(String uri, String localName, String qName) throws SAXException {
+    public void setValue(String qName, String data, Map<String, String> attributes) {
         switch (qName) {
-            case PAGE -> currentSite.getPage().add(currentPage);
+            case PAGE -> {
+                currentPage = objectFactory.createPage();
+                currentPage.setId(attributes.get(ID));
+                currentSite.getPage().add(currentPage);
+            }
 
-            case TITLE -> currentPage.setTitle(currentElementData);
-            case TYPE -> currentPage.setType(Type.fromValue(currentElementData));
+            case TITLE -> currentPage.setTitle(data);
+            case TYPE -> currentPage.setType(Type.fromValue(data));
             case CHARS -> currentPage.setChars(objectFactory.createChars());
-            case AUTHORIZE -> currentPage.setAuthorize(Boolean.parseBoolean(currentElementData));
+            case AUTHORIZE -> currentPage.setAuthorize(Boolean.parseBoolean(data));
 
             case HAS_EMAIL ->
-                    currentPage.getChars().setHasEmail(Boolean.parseBoolean(currentElementData));
+                    currentPage.getChars().setHasEmail(Boolean.parseBoolean(data));
             case HAS_ARCHIVES ->
-                    currentPage.getChars().setHasArchives(Boolean.parseBoolean(currentElementData));
+                    currentPage.getChars().setHasArchives(Boolean.parseBoolean(data));
             case HAS_NEWS ->
-                    currentPage.getChars().setHasNews(Boolean.parseBoolean(currentElementData));
+                    currentPage.getChars().setHasNews(Boolean.parseBoolean(data));
             case POLL ->
-                    currentPage.getChars().setPoll(currentElementData);
+                    currentPage.getChars().setPoll(data);
             case PAID ->
-                    currentPage.getChars().setPaid(Boolean.parseBoolean(currentElementData));
+                    currentPage.getChars().setPaid(Boolean.parseBoolean(data));
         }
     }
     
-    public Site getCurrentSite() {
+    public Site getSite() {
         return currentSite;
     }
 }
