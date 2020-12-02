@@ -3,30 +3,30 @@
     <page id="main">
         <title>Main page</title>
         <type>portal</type>
+        <authorize>false</authorize>
         <chars>
             <paid>false</paid>
             <poll>authorized</poll>
         </chars>
-        <authorize>false</authorize>
     </page>
     <page id="mail">
         <title>YourMail</title>
         <type>mirror</type>
+        <authorize>true</authorize>
         <chars>
             <paid>true</paid>
-            <hasEmail>true</hasEmail>
             <poll>no</poll>
+            <hasEmail>true</hasEmail>
         </chars>
-        <authorize>true</authorize>
     </page>
     <page id="the-news">
         <title>YourNews</title>
         <type>news</type>
+        <authorize>false</authorize>
         <chars>
             <paid>false</paid>
-            <hasNews>true</hasNews>
             <poll>anonymous</poll>
+            <hasNews>true</hasNews>
         </chars>
-        <authorize>false</authorize>
     </page>
 </site>

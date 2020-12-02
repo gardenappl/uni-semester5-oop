@@ -2,8 +2,6 @@ package ua.yuriih.lab2;
 
 
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import ua.yuriih.lab2.model.*;
 import ua.yuriih.lab2.parsers.*;
 
@@ -13,8 +11,8 @@ import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ParserTests {
-    private static final File testFileDir = new File("src" + File.separator + 
-            "test" + File.separator + "resources");
+    private static final String TEST_FILE_DIR = "src" + File.separator +
+            "test" + File.separator + "resources";
     
     @Test
     public void parseXML_SAX() {
@@ -32,14 +30,15 @@ public class ParserTests {
     }
     
     private void parseXML_test(SiteXMLParser parser) {
-        assertDoesNotThrow(() -> parseXML_expected(parser));
+        assertDoesNotThrow(() -> parseXML_expected(parser, "site.xml"));
+        assertDoesNotThrow(() -> parseXML_expected(parser, "site_wrong_order.xml"));
         parseXML_malformed(parser);
         parseXML_wrong_elements(parser);
         parseXML_wrong_count(parser);
     }
     
-    private void parseXML_expected(SiteXMLParser parser) throws IOException, XMLParserException {
-        Site site = parser.parseXML(new File(testFileDir, "site.xml"));
+    private void parseXML_expected(SiteXMLParser parser, String fileName) throws IOException, XMLParserException {
+        Site site = parser.parseXML(new File(TEST_FILE_DIR, fileName));
         assertEquals(3, site.getPage().size());
 
         Page page = site.getPage().get(1);
@@ -52,16 +51,16 @@ public class ParserTests {
     }
 
     private void parseXML_wrong_count(SiteXMLParser parser) {
-        assertDoesNotThrow(() -> parser.parseXML(new File(testFileDir, "site_wrong_count.xml")));
+        assertDoesNotThrow(() -> parser.parseXML(new File(TEST_FILE_DIR, "site_wrong_count.xml")));
     }
 
     private void parseXML_wrong_elements(SiteXMLParser parser) {
         assertThrows(XMLParserException.class,
-                () -> parser.parseXML(new File(testFileDir, "site_wrong_elements.xml")));
+                () -> parser.parseXML(new File(TEST_FILE_DIR, "site_wrong_elements.xml")));
     }
 
     private void parseXML_malformed(SiteXMLParser parser) {
         assertThrows(XMLParserException.class,
-                () -> parser.parseXML(new File(testFileDir, "site_malformed.xml")));
+                () -> parser.parseXML(new File(TEST_FILE_DIR, "site_malformed.xml")));
     }
 }
