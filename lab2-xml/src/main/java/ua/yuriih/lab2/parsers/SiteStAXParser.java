@@ -1,10 +1,9 @@
-package ua.yuriih.lab2;
+package ua.yuriih.lab2.parsers;
 
 import ua.yuriih.lab2.model.Site;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Characters;

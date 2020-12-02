@@ -1,11 +1,11 @@
 package ua.yuriih.lab2;
 
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ua.yuriih.lab2.model.*;
+import ua.yuriih.lab2.parsers.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,8 +13,6 @@ import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ParserTests {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ParserTests.class);
-    
     private static final File testFileDir = new File("src" + File.separator + 
             "test" + File.separator + "resources");
     
@@ -42,14 +40,15 @@ public class ParserTests {
     
     private void parseXML_expected(SiteXMLParser parser) throws IOException, XMLParserException {
         Site site = parser.parseXML(new File(testFileDir, "site.xml"));
-        Page page = site.getPage().get(0);
+        assertEquals(3, site.getPage().size());
+
+        Page page = site.getPage().get(1);
         assertEquals("main", page.getId());
         assertEquals("Main page", page.getTitle());
         assertEquals(Type.PORTAL, page.getType());
         assertFalse(page.isAuthorize());
         assertFalse(page.getChars().isPaid());
         assertEquals(Poll.AUTHORIZED, page.getChars().getPoll());
-        
     }
 
     private void parseXML_wrong_count(SiteXMLParser parser) {

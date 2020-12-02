@@ -1,12 +1,13 @@
-package ua.yuriih.lab2;
+package ua.yuriih.lab2.parsers;
 
-import org.jetbrains.annotations.NotNull;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
+import ua.yuriih.lab2.PageComparator;
 import ua.yuriih.lab2.model.*;
+import ua.yuriih.lab2.parsers.XMLParserException;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
 
 public class SiteHandler {
     private static final String SITE = "site";
@@ -26,6 +27,7 @@ public class SiteHandler {
 
     private static final ObjectFactory objectFactory = new ObjectFactory();
     private Site currentSite = new Site();
+    private List<Page> pages = new ArrayList<>();
     private Page currentPage;
 
     public void SiteHandler() {
@@ -43,7 +45,7 @@ public class SiteHandler {
             case PAGE -> {
                 currentPage = objectFactory.createPage();
                 currentPage.setId(attributeMap.get(ID));
-                currentSite.getPage().add(currentPage);
+                pages.add(currentPage);
             }
 
             case TITLE -> currentPage.setTitle(data);
@@ -67,6 +69,9 @@ public class SiteHandler {
     }
     
     public Site getSite() {
+        currentSite.getPage().clear();
+        pages.sort(new PageComparator());
+        currentSite.getPage().addAll(pages);
         return currentSite;
     }
 }

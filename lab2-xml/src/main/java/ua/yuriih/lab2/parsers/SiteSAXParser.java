@@ -1,4 +1,4 @@
-package ua.yuriih.lab2;
+package ua.yuriih.lab2.parsers;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
