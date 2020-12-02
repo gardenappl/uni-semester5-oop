@@ -11,10 +11,14 @@
     </xs:element>
 
     <xs:complexType name="Page">
-        <xs:sequence minOccurs="0">
+        <xs:sequence>
             <xs:element name="title" type="xs:string"/>
             <xs:element name="type" type="Type"/>
-            <xs:element name="chars" type="Chars"/>
+            <xs:element name="chars" type="Chars">
+                <xs:alternative type="Chars-news" test="..type = 'news'"/>
+                <xs:alternative type="Chars-mirror" test="..type = 'mirror'"/>
+                <xs:alternative type="Chars-portal" test="..type = 'portal'"/>
+            </xs:element>
             <xs:element name="authorize" type="xs:boolean"/>
         </xs:sequence>
         <xs:attribute name="id" type="xs:ID"/>
@@ -32,9 +36,6 @@
     <xs:complexType name="Chars">
         <xs:sequence>
             <xs:element name="paid" type="xs:boolean"/>
-            <xs:element name="hasEmail" type="xs:boolean"/>
-            <xs:element name="hasNews" type="xs:boolean"/>
-            <xs:element name="hasArchives" type="xs:boolean"/>
             <xs:element name="poll">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
@@ -46,4 +47,37 @@
             </xs:element>
         </xs:sequence>
     </xs:complexType>
+    
+    <xs:complexType name="Chars-news">
+        <xs:complexContent>
+            <xs:extension base="Chars">
+                <xs:sequence>
+                    <xs:element name="hasEmail" type="xs:boolean"/>
+                    <xs:element name="hasNews" type="xs:boolean"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="Chars-mirror">
+        <xs:complexContent>
+            <xs:extension base="Chars">
+                <xs:sequence>
+                    <xs:element name="hasEmail" type="xs:boolean"/>
+                    <xs:element name="hasArchives" type="xs:boolean"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="Chars-portal">
+        <xs:complexContent>
+            <xs:extension base="Chars">
+                <xs:sequence>
+                    <xs:element name="hasEmail" type="xs:boolean"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
 </xs:schema>
