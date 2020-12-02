@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<site>
+    <page id="main">
+        <title>Main page</title>
+        <type>portal</type>
+        <authorize>false</authorize>
+        <chars>
+            <paid>false</paid>
+            <poll>authorized</poll>
+        </chars>
+    </page>
+    <page id="mail">
+        <title>YourMail</title>
+        <type>mirror</type>
+        <authorize>true</authorize>
+        <chars>
+            <paid>true</paid>
+            <poll>no</poll>
+            <hasEmail>true</hasEmail>
+        </chars>
+    </page>
+    <page id="the-news">
+        <title>YourNews</title>
+        <type>news</type>
+        <authorize>false</authorize>
+        <chars>
+            <paid>false</paid>
+            <poll>anonymous</poll>
+            <hasNews>true</hasNews>
+        </chars>
+    </page>
+</site>

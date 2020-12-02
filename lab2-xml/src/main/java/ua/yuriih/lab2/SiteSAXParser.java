@@ -16,9 +16,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SiteSAXParser extends SiteXMLParser {
-    private static Logger LOGGER = LoggerFactory.getLogger(SiteSAXParser.class);
-    
-    private SAXParserFactory factory = SAXParserFactory.newInstance();
+    private static final Logger LOGGER = LoggerFactory.getLogger(SiteDOMParser.class);
+    private static SAXParserFactory factory = SAXParserFactory.newInstance();
     
     @Override
     public Site parseXML(File xmlFile) throws IOException, XMLParserException {
@@ -29,6 +28,7 @@ public class SiteSAXParser extends SiteXMLParser {
             parser.parse(xmlFile, handler);
             return handler.getCurrentSite();
         } catch (ParserConfigurationException e) {
+            LOGGER.error("Error in parser configuration", e);
             throw new RuntimeException(e);
         } catch (SAXException e) {
             throw new XMLParserException(e);

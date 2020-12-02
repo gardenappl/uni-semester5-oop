@@ -1,5 +1,6 @@
 package ua.yuriih.lab2;
 
+import org.jetbrains.annotations.NotNull;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -11,6 +12,7 @@ import ua.yuriih.lab2.model.Type;
 import java.util.Map;
 
 public class SiteHandler {
+    private static final String SITE = "site";
     private static final String PAGE = "page";
     private static final String ID = "id";
 
@@ -26,7 +28,7 @@ public class SiteHandler {
     private static final String PAID = "paid";
 
     private static final ObjectFactory objectFactory = new ObjectFactory();
-    private Site currentSite;
+    private Site currentSite = new Site();
     private Page currentPage;
 
     public void SiteHandler() {
@@ -38,11 +40,12 @@ public class SiteHandler {
         return qName.equals(PAGE) || qName.equals(CHARS);
     }
 
-    public void setValue(String qName, String data, Map<String, String> attributes) {
+    public void setValue(String qName, String data, Map<String, String> attributeMap) {
         switch (qName) {
+            case SITE -> { /* no-op */ }
             case PAGE -> {
                 currentPage = objectFactory.createPage();
-                currentPage.setId(attributes.get(ID));
+                currentPage.setId(attributeMap.get(ID));
                 currentSite.getPage().add(currentPage);
             }
 
@@ -61,6 +64,8 @@ public class SiteHandler {
                     currentPage.getChars().setPoll(data);
             case PAID ->
                     currentPage.getChars().setPaid(Boolean.parseBoolean(data));
+
+            default -> throw new IllegalArgumentException("Invalid qualified name " + qName);
         }
     }
     

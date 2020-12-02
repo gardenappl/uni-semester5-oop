@@ -18,7 +18,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class SiteStAXParser extends SiteXMLParser {
-    private final XMLInputFactory factory = XMLInputFactory.newFactory();
+    private static final XMLInputFactory factory = XMLInputFactory.newFactory();
     
     @Override
     public Site parseXML(File xmlFile) throws IOException, XMLParserException {
@@ -32,13 +32,13 @@ public class SiteStAXParser extends SiteXMLParser {
                 if (event.isStartElement()) {
                     StartElement startElement = event.asStartElement();
                     String qName = startElement.getName().toString();
-                    Map<String, String> attributes = attributesToMap(startElement.getAttributes());
+                    Map<String, String> attributeMap = attributesToMap(startElement.getAttributes());
                     
                     XMLEvent nextEvent = eventReader.peek();
                     if (nextEvent != null && nextEvent.isCharacters()) {
                         Characters characters = eventReader.nextEvent().asCharacters();
-                        
-                        siteHandler.setValue(qName, characters.getData(), attributes);
+
+                        siteHandler.setValue(qName, characters.getData(), attributeMap);
                     }
                 }
             }
