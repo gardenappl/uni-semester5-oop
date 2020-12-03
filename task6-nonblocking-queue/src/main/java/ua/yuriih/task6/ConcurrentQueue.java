@@ -33,14 +33,6 @@ public class ConcurrentQueue<T> {
 
             if (currentTail.get() == tail.get()) {
                 if (next.get() == null) {
-                    // compareAndSet is an atomic operation.
-                    // We compare the value stored at a memory location
-                    // with some expectedValue.
-                    // If they are equal, we set the contents of that memory location
-                    // to a new value, and return true.
-                    // Otherwise we refuse to modify it and return false.
-                    // The operation is atomic: another thread cannot modify that memory
-                    // between the "compare" and "set" steps.
                     if (currentTail.get().next.compareAndSet(null, node))
                         break;
                 } else {

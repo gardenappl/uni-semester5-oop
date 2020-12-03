@@ -16,25 +16,28 @@ public class ParserTests {
     
     @Test
     public void parseXML_SAX() {
-        parseXML_test(new SiteSAXParser());
+        parseXML(new SiteSAXParser());
     }
 
     @Test
     public void parseXML_StAX() {
-        parseXML_test(new SiteStAXParser());
+        parseXML(new SiteStAXParser());
     }
 
     @Test
     public void parseXML_DOM() {
-        parseXML_test(new SiteDOMParser());
+        parseXML(new SiteDOMParser());
     }
     
-    private void parseXML_test(SiteXMLParser parser) {
+    private void parseXML(SiteXMLParser parser) {
         assertDoesNotThrow(() -> parseXML_expected(parser, "site.xml"));
         assertDoesNotThrow(() -> parseXML_expected(parser, "site_wrong_order.xml"));
-        parseXML_malformed(parser);
-        parseXML_wrong_elements(parser);
-        parseXML_wrong_count(parser);
+        assertThrows(XMLParserException.class,
+                () -> parser.parseXML(new File(TEST_FILE_DIR, "site_malformed.xml")));
+        assertThrows(XMLParserException.class,
+                () -> parser.parseXML(new File(TEST_FILE_DIR, "site_wrong_elements.xml")));
+        assertDoesNotThrow(() ->
+                parser.parseXML(new File(TEST_FILE_DIR, "site_wrong_count.xml")));
     }
     
     private void parseXML_expected(SiteXMLParser parser, String fileName) throws IOException, XMLParserException {
@@ -48,19 +51,5 @@ public class ParserTests {
         assertFalse(page.isAuthorize());
         assertFalse(page.getChars().isPaid());
         assertEquals(Poll.AUTHORIZED, page.getChars().getPoll());
-    }
-
-    private void parseXML_wrong_count(SiteXMLParser parser) {
-        assertDoesNotThrow(() -> parser.parseXML(new File(TEST_FILE_DIR, "site_wrong_count.xml")));
-    }
-
-    private void parseXML_wrong_elements(SiteXMLParser parser) {
-        assertThrows(XMLParserException.class,
-                () -> parser.parseXML(new File(TEST_FILE_DIR, "site_wrong_elements.xml")));
-    }
-
-    private void parseXML_malformed(SiteXMLParser parser) {
-        assertThrows(XMLParserException.class,
-                () -> parser.parseXML(new File(TEST_FILE_DIR, "site_malformed.xml")));
     }
 }

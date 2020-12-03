@@ -71,9 +71,9 @@ class CustomFixedThreadPoolTest {
         assertEquals(0, threadPool.getQueueSize());
 
         for (int i = 0; i < TASK_COUNT; i++) {
-            threadPool.execute(() -> {
-                assertDoesNotThrow(() -> Thread.sleep(100));
-            });
+            threadPool.execute(() ->
+                assertDoesNotThrow(() -> Thread.sleep(100))
+            );
         }
         assertEquals(3, threadPool.getQueueSize());
         Thread.sleep(150);

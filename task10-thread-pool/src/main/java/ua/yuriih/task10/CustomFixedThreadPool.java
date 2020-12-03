@@ -15,7 +15,8 @@ public class CustomFixedThreadPool implements Executor {
     private final Thread[] threads;
     private final ThreadPoolRunnable[] threadPoolRunnables;
     private final LinkedList<Runnable> runnableQueue;
-    private volatile boolean isShuttingDown;
+    private boolean isShuttingDown;
+    private boolean isShuttingDownNow;
 
     public CustomFixedThreadPool(int threadCount) {
         if (threadCount <= 0)
@@ -40,6 +41,7 @@ public class CustomFixedThreadPool implements Executor {
 
     public List<Runnable> shutdownNow() {
         isShuttingDown = true;
+        isShuttingDownNow = true;
         for (Thread thread : threads)
             thread.interrupt();
 
@@ -101,7 +103,7 @@ public class CustomFixedThreadPool implements Executor {
                             this.wait();
                         }
                     } catch (InterruptedException e) {
-                        if (threadPool.isShuttingDown)
+                        if (threadPool.isShuttingDownNow)
                             break mainLoop;
                     }
                 }
@@ -111,6 +113,8 @@ public class CustomFixedThreadPool implements Executor {
                 } catch (Exception e) {
                     LOGGER.error("Exception in thread pool", e);
                 }
+                if (threadPool.isShuttingDownNow)
+                    break;
 
                 currentRunnable = null;
                 threadPool.onRunnableFreed(this.slot);
