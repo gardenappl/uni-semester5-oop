@@ -24,6 +24,8 @@ public class GameFieldView extends View {
     private Paint paintMissed = new Paint();
     private Paint paintShip = new Paint();
 
+    private boolean revealOpponent = false;
+
     public GameFieldView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
@@ -45,6 +47,10 @@ public class GameFieldView extends View {
 
     public void showPlayer(Player player) {
         this.shownPlayer = player;
+    }
+
+    public void revealOpponent(boolean revealOpponent) {
+        this.revealOpponent = revealOpponent;
     }
 
     private Paint getPaintForCell(CellState cell) {
@@ -79,7 +85,7 @@ public class GameFieldView extends View {
         for (int x = 0; x < controller.getWidth(); x++) {
             for (int y = 0; y < controller.getHeight(); y++) {
                 CellState cell;
-                if (shownPlayer == Player.AI)
+                if (shownPlayer == Player.AI && revealOpponent)
                     cell = field.getCellAsOpponent(x, y);
                 else
                     cell = field.getCell(x, y);

@@ -56,4 +56,12 @@ public class GameField {
     public boolean isValidCellForShip(int x, int y) {
         return isValidCellForShip(x, y, Collections.<Point>emptySet());
     }
+
+    public boolean isValidCellForShip(Point point, Set<Point> ignorePoints) {
+        return isValidCellForShip(point.x, point.y, ignorePoints);
+    }
+
+    public boolean isValidCellForShip(Point point) {
+        return isValidCellForShip(point.x, point.y, Collections.<Point>emptySet());
+    }
 }

@@ -4,10 +4,10 @@ import android.content.Context;
 import android.graphics.Point;
 import android.os.Vibrator;
 import android.util.Log;
-import android.view.View;
+
+import androidx.collection.ArraySet;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,55 +21,90 @@ public class StateCreatePlayerField extends GameState {
 
     private static final int NOT_DRAWING = Integer.MIN_VALUE;
     private int currentDrawingPointerId = NOT_DRAWING;
+    private int lastDrawX = NOT_DRAWING;
+    private int lastDrawY = NOT_DRAWING;
 
-    private final Set<Point> currentDrawnFigure = new HashSet<>(4);
-    private final Map<Integer, Integer> figureSizeCount = new HashMap<>(4);
-    private final int[] maxCountForSize = new int[] {0, 4, 3, 2, 1};
+    private final Set<Point> currentShip = new ArraySet<>(4);
+    private final Map<Integer, Integer> shipCountBySize = new HashMap<>(4);
 
     public StateCreatePlayerField(GameController controller) {
         super(controller);
 
         for (int i = 1; i <= 4; i++)
-            figureSizeCount.put(i, 0);
+            shipCountBySize.put(i, 0);
     }
 
-    private int getCountForFigureSize(int size) {
+    private int getShipCount(int size) {
         if (size < 1)
             throw new IllegalArgumentException();
         if (size > 4)
             return 0;
-        return figureSizeCount.get(size);
+        return shipCountBySize.get(size);
     }
 
-    public int getMaxCountForFigureSize(int size) {
-        if (size < 1)
-            throw new IllegalArgumentException();
-        if (size > 4)
-            return 0;
-        return maxCountForSize[size];
+    private int getLargestAvailableShipSize() {
+        int maxAvailableShipSize = 0;
+        for (int size = 1; size <= 4; size++) {
+            if (getShipCount(size) < getController().getMaxShipCount(size))
+                maxAvailableShipSize = size;
+        }
+        return maxAvailableShipSize;
+    }
+
+    private boolean isValidCoordinate(int x, int y) {
+        if (x == NOT_DRAWING) {
+            if (y == NOT_DRAWING)
+                return false;
+            throw new IllegalArgumentException("x is invalid but y is valid");
+        }
+        if (y == NOT_DRAWING)
+            throw new IllegalArgumentException("x is valid but y is invalid");
+        return true;
+    }
+
+    private boolean isAdjacent(int x1, int y1, int x2, int y2) {
+        if (!isValidCoordinate(x1, y1) || !isValidCoordinate(x2, y2))
+            return true;
+        return Math.abs(x2 - x1) <= 1 && Math.abs(y2 - y1) <= 1;
+    }
+
+    private boolean isTouching(int x1, int y1, int x2, int y2) {
+        if (!isValidCoordinate(x1, y1) || !isValidCoordinate(x2, y2))
+            return true;
+        return (x1 == x2 && Math.abs(y2 - y1) == 1) ||
+                (y1 == y2 && Math.abs(x2 - x1) == 1);
     }
 
     private boolean drawPlayerCell(int x, int y) {
-        Point point = new Point(x, y);
-        if (currentDrawnFigure.contains(point))
+        if (isValidCoordinate(lastDrawX, lastDrawY) &&
+                !isTouching(x, y, lastDrawX, lastDrawY))
             return false;
 
+        Point point = new Point(x, y);
+        if (currentShip.contains(point)) {
+            lastDrawX = x;
+            lastDrawY = y;
+            return false;
+        }
+
         GameField humanField = getController().getField(Player.HUMAN);
-        int size = currentDrawnFigure.size();
-        if (getCountForFigureSize(size + 1) < getMaxCountForFigureSize(size + 1) &&
-                humanField.isValidCellForShip(x, y, currentDrawnFigure)) {
+        int size = currentShip.size();
+        if (size + 1 <= getLargestAvailableShipSize() &&
+                humanField.isValidCellForShip(x, y, currentShip)) {
             humanField.setCell(x, y, CellState.SHIP);
-            currentDrawnFigure.add(point);
+            currentShip.add(point);
+            lastDrawX = x;
+            lastDrawY = y;
 
             getController().redrawUI();
             return true;
         } else {
-            onFailDrawPlayerCell(x, y);
+            onFailDrawPlayerCell();
             return false;
         }
     }
 
-    private void onFailDrawPlayerCell(int x, int y) {
+    private void onFailDrawPlayerCell() {
         Context appContext = getController().getApplicationContext();
         Vibrator vibrator = (Vibrator)appContext.getSystemService(Context.VIBRATOR_SERVICE);
         vibrator.vibrate(50);
@@ -82,7 +117,7 @@ public class StateCreatePlayerField extends GameState {
             if (humanField.isValidCellForShip(x, y))
                 currentDrawingPointerId = pointerId;
             else
-                onFailDrawPlayerCell(x, y);
+                onFailDrawPlayerCell();
         }
     }
 
@@ -98,11 +133,31 @@ public class StateCreatePlayerField extends GameState {
         if (player == Player.HUMAN && currentDrawingPointerId == pointerId) {
             drawPlayerCell(x, y);
             currentDrawingPointerId = NOT_DRAWING;
+            lastDrawX = NOT_DRAWING;
+            lastDrawY = NOT_DRAWING;
 
-            int figureSize = currentDrawnFigure.size();
-            if (figureSize > 0) {
-                figureSizeCount.put(figureSize, figureSizeCount.get(figureSize) + 1);
-                currentDrawnFigure.clear();
+            int shipSize = currentShip.size();
+
+            if (shipSize > 0) {
+                if (getShipCount(shipSize) >= getController().getMaxShipCount(shipSize)) {
+                    Log.d(LOGGING_TAG, "Cancel ship");
+                    //Cancel ship
+                    GameField humanField = getController().getField(Player.HUMAN);
+                    for (Point point : currentShip)
+                        humanField.setCell(point.x, point.y, CellState.EMPTY);
+                    onFailDrawPlayerCell();
+                    getController().redrawUI();
+                } else {
+                    Log.d(LOGGING_TAG, "Ship count for size " + shipSize +
+                            " is now " + (shipCountBySize.get(shipSize) + 1));
+                    shipCountBySize.put(shipSize, shipCountBySize.get(shipSize) + 1);
+                }
+                currentShip.clear();
+            }
+
+            if (getLargestAvailableShipSize() == 0) {
+                getController().setNextState(new StateCreateAIField(getController()));
+                getController().startNextState();
             }
         }
     }
