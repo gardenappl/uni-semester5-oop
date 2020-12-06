@@ -20,16 +20,16 @@ public class StateCreateAIField extends GameState {
     @Override
     public void start() {
         GameController controller = getController();
-        GameField aiField = controller.getField(Player.HUMAN);
-        for (int x = 0; x < controller.getWidth(); x++) {
+        GameField aiField = controller.getField(Player.AI);
+        /*for (int x = 0; x < controller.getWidth(); x++) {
             for (int y = 0; y < controller.getHeight(); y++)
                 aiField.setCell(x, y, CellState.EMPTY);
-        }
+        }*/
         for (int size = 4; size >= 1; size--) {
             for (int j = 0; j < controller.getMaxShipCount(size); j++)
                 placeRandomPiece(size, aiField);
         }
-        controller.redrawUI();
+//        controller.redrawUI();
         Log.d(LOGGING_TAG, "Created AI field");
     }
 
@@ -79,6 +79,10 @@ public class StateCreateAIField extends GameState {
 
             for (int i = 1; i < size; i++) {
                 Point point = getRandomTouchingPoint(lastPoint);
+                for (int j = 0; j < i; j++) {
+                    if (figurePoints[j].equals(point))
+                        continue randomLoop;
+                }
                 if (!aiField.isValidCellForShip(point))
                     continue randomLoop;
                 figurePoints[i] = point;

@@ -21,6 +21,7 @@ import ua.yuriih.battleship.model.Player;
 
 public class GameController {
     private final Context appContext;
+    private GameActivity gameActivity;
     private final Random rng;
 
     private static final int SIZE = 10;
@@ -47,6 +48,10 @@ public class GameController {
 
     public void registerView(View view) {
         views.add(view);
+    }
+    
+    public void setGameActivity(GameActivity activity) {
+        this.gameActivity = activity;
     }
 
     public int getWidth() {
@@ -102,8 +107,8 @@ public class GameController {
         state.onTouchCell(player, x, y, pointerId);
     }
 
-    public void onTouchCellUp(Player player, int x, int y, int pointerId) {
-        state.onTouchCellUp(player, x, y, pointerId);
+    public void onTouchCellUp(Player player, int pointerId) {
+        state.onTouchCellUp(player, pointerId);
     }
 
     public void setNextState(GameState nextState) {
@@ -111,8 +116,13 @@ public class GameController {
     }
 
     public void startNextState() {
+        GameState oldState = this.state;
+        GameState newState = this.nextState;
+
         this.state = this.nextState;
         this.nextState = null;
         this.state.start();
+
+        gameActivity.onStateChange(oldState, newState);
     }
 }

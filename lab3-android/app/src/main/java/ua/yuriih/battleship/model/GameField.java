@@ -34,7 +34,7 @@ public class GameField {
         if (cell == CellState.SHIP)
             return CellState.EMPTY;
         else
-            return CellState.SHIP;
+            return cell;
     }
 
     public void setCell(int x, int y, CellState state) {

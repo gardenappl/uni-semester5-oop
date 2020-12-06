@@ -3,4 +3,10 @@
     <string name="switch_to_ai">See Enemy\'s Field</string>
     <string name="switch_to_player">See Player\'s Field</string>
     <string name="draw_your_field">Draw your field!</string>
+    <string name="your_turn">Your turn</string>
+    <string name="you_missed">You missed!</string>
+    <string name="you_hit">Successful hit!</string>
+    <string name="you_sunk">Ship defeated!</string>
+    <string name="you_win">You won!</string>
+    <string name="you_lose">You lost!</string>
 </resources>

@@ -47,6 +47,11 @@ public class GameFieldView extends View {
 
     public void showPlayer(Player player) {
         this.shownPlayer = player;
+        invalidate();
+    }
+
+    public Player getShownPlayer() {
+        return shownPlayer;
     }
 
     public void revealOpponent(boolean revealOpponent) {
@@ -85,7 +90,7 @@ public class GameFieldView extends View {
         for (int x = 0; x < controller.getWidth(); x++) {
             for (int y = 0; y < controller.getHeight(); y++) {
                 CellState cell;
-                if (shownPlayer == Player.AI && revealOpponent)
+                if (shownPlayer == Player.AI && !revealOpponent)
                     cell = field.getCellAsOpponent(x, y);
                 else
                     cell = field.getCell(x, y);
@@ -116,6 +121,13 @@ public class GameFieldView extends View {
     }
 
     private void onTouchEvent(float x, float y, int action, int pointerId) {
+        switch (action) {
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_POINTER_UP:
+                controller.onTouchCellUp(shownPlayer, pointerId);
+                return;
+        }
+
         int cellX = (int) (x / getCellSize());
         int cellY = (int) (y / getCellSize());
         if (cellX < 0 || cellX >= controller.getWidth())
@@ -129,14 +141,10 @@ public class GameFieldView extends View {
             case MotionEvent.ACTION_DOWN:
             case MotionEvent.ACTION_POINTER_DOWN:
                 controller.onTouchCellDown(shownPlayer, cellX, cellY, pointerId);
-                break;
+                return;
             case MotionEvent.ACTION_MOVE:
                 controller.onTouchCell(shownPlayer, cellX, cellY, pointerId);
-                break;
-            case MotionEvent.ACTION_UP:
-            case MotionEvent.ACTION_POINTER_UP:
-                controller.onTouchCellUp(shownPlayer, cellX, cellY, pointerId);
-                break;
+                return;
         }
     }
 }

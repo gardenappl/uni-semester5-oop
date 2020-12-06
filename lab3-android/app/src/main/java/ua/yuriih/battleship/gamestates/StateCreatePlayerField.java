@@ -129,9 +129,8 @@ public class StateCreatePlayerField extends GameState {
     }
 
     @Override
-    public void onTouchCellUp(Player player, int x, int y, int pointerId) {
+    public void onTouchCellUp(Player player, int pointerId) {
         if (player == Player.HUMAN && currentDrawingPointerId == pointerId) {
-            drawPlayerCell(x, y);
             currentDrawingPointerId = NOT_DRAWING;
             lastDrawX = NOT_DRAWING;
             lastDrawY = NOT_DRAWING;
