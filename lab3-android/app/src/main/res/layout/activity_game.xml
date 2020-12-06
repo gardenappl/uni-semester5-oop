@@ -19,8 +19,22 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:keepScreenOn="true"
-            app:layout_constraintBottom_toTopOf="@id/switch_perspective"
+            app:layout_constraintBottom_toTopOf="@id/game_state_label"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/game_state_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/draw_your_field"
+            android:textColor="#FFFFFF"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:typeface="serif"
+            app:layout_constraintBottom_toTopOf="@id/switch_perspective"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <Button
             android:id="@+id/switch_perspective"
@@ -33,20 +47,6 @@
             android:text="@string/switch_to_ai"
             android:textAllCaps="true"
             android:textSize="18sp"
-            app:layout_constraintBottom_toTopOf="@id/game_state_label"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <TextView
-            android:id="@+id/game_state_label"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/draw_your_field"
-            android:textColor="#FFFFFF"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:typeface="serif"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />

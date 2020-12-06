@@ -12,18 +12,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import ua.yuriih.battleship.gamestates.GameState;
+import ua.yuriih.battleship.gamestates.StateCreatePlayerField;
 import ua.yuriih.battleship.model.CellState;
 import ua.yuriih.battleship.model.GameField;
 import ua.yuriih.battleship.model.Player;
 
 public class GameController {
-    private enum State {
-        CREATING_PLAYER_FIELD,
-        PLAYING,
-        GAME_ENDED
-    }
-
-    private static final String LOGGING_TAG = "GameController";
 
     private final Context appContext;
 
@@ -31,24 +26,16 @@ public class GameController {
     private final GameField playerField;
     private final GameField aiField;
 
-    private State state;
-
-    private static final int NOT_DRAWING = Integer.MIN_VALUE;
-    private int currentDrawingPointerId = NOT_DRAWING;
-    private final Set<Point> currentDrawnFigure = new HashSet<>(4);
-    private final Map<Integer, Integer> figureSizeCount = new HashMap<>(4);
+    private GameState state;
 
     private final ArrayList<View> views = new ArrayList<>();
-    private final int[] maxCountForSize = new int[] {0, 4, 3, 2, 1};
 
 
     public GameController(Context appContext) {
         this.appContext = appContext;
         playerField = new GameField(SIZE, SIZE);
         aiField = new GameField(SIZE, SIZE);
-        state = State.CREATING_PLAYER_FIELD;
-        for (int i = 1; i <= 4; i++)
-            figureSizeCount.put(i, 0);
+        state = new StateCreatePlayerField(this);
     }
 
     public void registerView(View view) {
@@ -61,6 +48,10 @@ public class GameController {
 
     public int getHeight() {
         return SIZE;
+    }
+
+    public Context getApplicationContext() {
+        return appContext;
     }
 
     public GameField getField(Player player) {
@@ -98,80 +89,20 @@ public class GameController {
                 (y1 == y2 && Math.abs(x2 - x1) == 1);
     }*/
 
-    private void onFailDrawPlayerCell(int x, int y) {
-        Log.d(LOGGING_TAG, "invalid");
-        Vibrator vibrator = (Vibrator)appContext.getSystemService(Context.VIBRATOR_SERVICE);
-        vibrator.vibrate(50);
-    }
-
-    public int getMaxCountForFigureSize(int size) {
-        if (size < 1)
-            throw new IllegalArgumentException();
-        if (size > 4)
-            return 0;
-        return maxCountForSize[size];
-    }
-
-    public int getCountForFigureSize(int size) {
-        if (size < 1)
-            throw new IllegalArgumentException();
-        if (size > 4)
-            return 0;
-        return figureSizeCount.get(size);
-    }
-
-    private boolean drawPlayerCell(int x, int y) {
-        Point point = new Point(x, y);
-        if (currentDrawnFigure.contains(point))
-            return false;
-
-        int size = currentDrawnFigure.size();
-        if (getCountForFigureSize(size + 1) < getMaxCountForFigureSize(size + 1) &&
-                playerField.isValidCellForShip(x, y, currentDrawnFigure)) {
-            Log.d(LOGGING_TAG, "valid");
-            playerField.setCell(x, y, CellState.SHIP);
-            currentDrawnFigure.add(point);
-
-            for (View view : views)
-                view.invalidate();
-            return true;
-        } else {
-            onFailDrawPlayerCell(x, y);
-            return false;
-        }
+    public void redrawUI() {
+        for (View view : views)
+            view.invalidate();
     }
 
     public void onTouchCellDown(Player player, int x, int y, int pointerId) {
-        if (player == Player.HUMAN) {
-            if (state == State.CREATING_PLAYER_FIELD && currentDrawingPointerId == NOT_DRAWING) {
-                if (playerField.isValidCellForShip(x, y))
-                    currentDrawingPointerId = pointerId;
-                else
-                    onFailDrawPlayerCell(x, y);
-            }
-        }
+        state.onTouchCellDown(player, x, y, pointerId);
     }
 
     public void onTouchCell(Player player, int x, int y, int pointerId) {
-        if (player == Player.HUMAN) {
-            if (state == State.CREATING_PLAYER_FIELD && currentDrawingPointerId == pointerId) {
-                drawPlayerCell(x, y);
-            }
-        }
+        state.onTouchCell(player, x, y, pointerId);
     }
 
     public void onTouchCellUp(Player player, int x, int y, int pointerId) {
-        if (player == Player.HUMAN) {
-            if (state == State.CREATING_PLAYER_FIELD && currentDrawingPointerId == pointerId) {
-                drawPlayerCell(x, y);
-                currentDrawingPointerId = NOT_DRAWING;
-
-                int figureSize = currentDrawnFigure.size();
-                if (figureSize > 0) {
-                    figureSizeCount.put(figureSize, figureSizeCount.get(figureSize) + 1);
-                    currentDrawnFigure.clear();
-                }
-            }
-        }
+        state.onTouchCellUp(player, x, y, pointerId);
     }
 }

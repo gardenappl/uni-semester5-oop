@@ -3,6 +3,7 @@ package ua.yuriih.battleship;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.view.View;
 
 public class GameActivity extends AppCompatActivity {
     private GameController state;
@@ -18,7 +19,7 @@ public class GameActivity extends AppCompatActivity {
         state.registerView(fieldView);
         fieldView.setGameController(state);
 
-
+        findViewById(R.id.switch_perspective).setVisibility(View.GONE);
     }
 
     @Override
