@@ -9,4 +9,7 @@
     <string name="you_sunk">Ship defeated!</string>
     <string name="you_win">You won!</string>
     <string name="you_lose">You lost!</string>
+    <string name="ai_hit">Opponent hit at %1$s</string>
+    <string name="ai_missed">Opponent missed at %1$s</string>
+    <string name="ai_sunk">Opponent destroyed ship at %1$s</string>
 </resources>

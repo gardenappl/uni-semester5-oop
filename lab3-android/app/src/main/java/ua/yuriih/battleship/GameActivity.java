@@ -5,9 +5,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import ua.yuriih.battleship.gamestates.GameState;
-import ua.yuriih.battleship.gamestates.StateCreatePlayerField;
+import ua.yuriih.battleship.gamestates.StateCreateHumanField;
+import ua.yuriih.battleship.gamestates.StateGameEnd;
+import ua.yuriih.battleship.gamestates.StateTurnAI;
+import ua.yuriih.battleship.gamestates.StateTurnHuman;
 import ua.yuriih.battleship.model.Player;
 
 public class GameActivity extends AppCompatActivity {
@@ -26,7 +30,7 @@ public class GameActivity extends AppCompatActivity {
         fieldView.setGameController(controller);
         fieldView.revealOpponent(true);
 
-        controller.setNextState(new StateCreatePlayerField(controller));
+        controller.setNextState(new StateCreateHumanField(controller));
         controller.startNextState();
 
         final Button switchButton = findViewById(R.id.switch_perspective);
@@ -42,7 +46,6 @@ public class GameActivity extends AppCompatActivity {
                 }
             }
         });
-        switchButton.setVisibility(View.GONE);
     }
 
     @Override
@@ -51,7 +54,25 @@ public class GameActivity extends AppCompatActivity {
     }
 
     public void onStateChange(GameState oldState, GameState newState) {
-        if (!(newState instanceof StateCreatePlayerField))
+        if (newState instanceof StateCreateHumanField)
+            findViewById(R.id.switch_perspective).setVisibility(View.GONE);
+        else
             findViewById(R.id.switch_perspective).setVisibility(View.VISIBLE);
+
+        TextView gameStateLabel = findViewById(R.id.game_state_label);
+
+        if (newState instanceof StateGameEnd) {
+            if (((StateGameEnd) newState).getWinner() == Player.HUMAN)
+                gameStateLabel.setText(R.string.you_win);
+            else
+                gameStateLabel.setText(R.string.you_lose);
+        } else if (oldState instanceof StateTurnHuman) {
+            if (((StateTurnHuman) oldState).destroyed())
+                gameStateLabel.setText(R.string.you_sunk);
+            else if (((StateTurnHuman) oldState).hit())
+                gameStateLabel.setText(R.string.you_hit);
+            else
+                gameStateLabel.setText(R.string.you_missed);
+        }
     }
 }

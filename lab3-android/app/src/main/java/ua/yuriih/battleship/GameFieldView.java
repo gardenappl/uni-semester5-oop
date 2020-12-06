@@ -121,19 +121,18 @@ public class GameFieldView extends View {
     }
 
     private void onTouchEvent(float x, float y, int action, int pointerId) {
-        switch (action) {
-            case MotionEvent.ACTION_UP:
-            case MotionEvent.ACTION_POINTER_UP:
-                controller.onTouchCellUp(shownPlayer, pointerId);
-                return;
-        }
-
         int cellX = (int) (x / getCellSize());
         int cellY = (int) (y / getCellSize());
-        if (cellX < 0 || cellX >= controller.getWidth())
+
+        if (cellX < 0 || cellX >= controller.getWidth() ||
+                cellY < 0 || cellY >= controller.getHeight()) {
+            switch (action) {
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_POINTER_UP:
+                    controller.onTouchCellUp(shownPlayer, pointerId);
+            }
             return;
-        if (cellY < 0 || cellY >= controller.getHeight())
-            return;
+        }
 
         //Log.d(LOGGING_TAG, "x: " + cellX + " y: " + cellY);
 
@@ -144,6 +143,10 @@ public class GameFieldView extends View {
                 return;
             case MotionEvent.ACTION_MOVE:
                 controller.onTouchCell(shownPlayer, cellX, cellY, pointerId);
+                return;
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_POINTER_UP:
+                controller.onTouchCellUp(shownPlayer, cellX, cellY, pointerId);
                 return;
         }
     }

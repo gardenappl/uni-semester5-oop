@@ -16,7 +16,7 @@ import ua.yuriih.battleship.model.CellState;
 import ua.yuriih.battleship.model.GameField;
 import ua.yuriih.battleship.model.Player;
 
-public class StateCreatePlayerField extends GameState {
+public class StateCreateHumanField extends GameState {
     private static final String LOGGING_TAG = "CreatePlayerField";
 
     private static final int NOT_DRAWING = Integer.MIN_VALUE;
@@ -27,7 +27,7 @@ public class StateCreatePlayerField extends GameState {
     private final Set<Point> currentShip = new ArraySet<>(4);
     private final Map<Integer, Integer> shipCountBySize = new HashMap<>(4);
 
-    public StateCreatePlayerField(GameController controller) {
+    public StateCreateHumanField(GameController controller) {
         super(controller);
 
         for (int i = 1; i <= 4; i++)
@@ -99,17 +99,10 @@ public class StateCreatePlayerField extends GameState {
             getController().redrawUI();
             return true;
         } else {
-            onFailDrawPlayerCell();
+            getController().vibrateForFailure();
             return false;
         }
     }
-
-    private void onFailDrawPlayerCell() {
-        Context appContext = getController().getApplicationContext();
-        Vibrator vibrator = (Vibrator)appContext.getSystemService(Context.VIBRATOR_SERVICE);
-        vibrator.vibrate(50);
-    }
-
     @Override
     public void onTouchCellDown(Player player, int x, int y, int pointerId) {
         if (player == Player.HUMAN && currentDrawingPointerId == NOT_DRAWING) {
@@ -117,7 +110,7 @@ public class StateCreatePlayerField extends GameState {
             if (humanField.isValidCellForShip(x, y))
                 currentDrawingPointerId = pointerId;
             else
-                onFailDrawPlayerCell();
+                getController().vibrateForFailure();
         }
     }
 
@@ -126,6 +119,14 @@ public class StateCreatePlayerField extends GameState {
         if (player == Player.HUMAN && currentDrawingPointerId == pointerId) {
             drawPlayerCell(x, y);
         }
+    }
+
+    @Override
+    public void onTouchCellUp(Player player, int x, int y, int pointerId) {
+        if (player == Player.HUMAN && currentDrawingPointerId == pointerId) {
+            drawPlayerCell(x, y);
+        }
+        onTouchCellUp(player, pointerId);
     }
 
     @Override
@@ -144,7 +145,7 @@ public class StateCreatePlayerField extends GameState {
                     GameField humanField = getController().getField(Player.HUMAN);
                     for (Point point : currentShip)
                         humanField.setCell(point.x, point.y, CellState.EMPTY);
-                    onFailDrawPlayerCell();
+                    getController().vibrateForFailure();
                     getController().redrawUI();
                 } else {
                     Log.d(LOGGING_TAG, "Ship count for size " + shipSize +

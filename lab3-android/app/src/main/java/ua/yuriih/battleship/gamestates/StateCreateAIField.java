@@ -31,6 +31,8 @@ public class StateCreateAIField extends GameState {
         }
 //        controller.redrawUI();
         Log.d(LOGGING_TAG, "Created AI field");
+        controller.setNextState(new StateTurnHuman(controller));
+        controller.startNextState();
     }
 
     private Point makeRandomPoint() {

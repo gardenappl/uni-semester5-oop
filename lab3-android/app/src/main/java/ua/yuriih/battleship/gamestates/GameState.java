@@ -20,5 +20,9 @@ public abstract class GameState {
 
     public void onTouchCell(Player player, int x, int y, int pointerId) {}
 
+    public void onTouchCellUp(Player player, int x, int y, int pointerId) {
+        onTouchCellUp(player, pointerId);
+    }
+
     public void onTouchCellUp(Player player, int pointerId) {}
 }
