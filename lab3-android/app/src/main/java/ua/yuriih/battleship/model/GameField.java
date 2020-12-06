@@ -21,7 +21,6 @@ public class GameField {
         for (CellState[] row : cells)
             Arrays.fill(row, CellState.EMPTY);
 
-        cells[1][2] = CellState.HIT;
         this.width = width;
         this.height = height;
     }

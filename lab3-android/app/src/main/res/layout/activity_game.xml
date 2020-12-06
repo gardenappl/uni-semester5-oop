@@ -14,17 +14,6 @@
         android:layout_height="match_parent"
         android:fitsSystemWindows="true">
 
-        <Button
-            android:id="@+id/switch_perspective"
-            style="?metaButtonBarButtonStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/switch_to_ai"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent" />
-
         <ua.yuriih.battleship.GameFieldView
             android:id="@+id/game_field"
             android:layout_width="match_parent"
@@ -32,6 +21,35 @@
             android:keepScreenOn="true"
             app:layout_constraintBottom_toTopOf="@id/switch_perspective"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/switch_perspective"
+            style="@style/Widget.AppCompat.Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="#FFFFFF"
+            android:fontFamily="serif"
+            android:text="@string/switch_to_ai"
+            android:textAllCaps="true"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@id/game_state_label"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/game_state_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/draw_your_field"
+            android:textColor="#FFFFFF"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:typeface="serif"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

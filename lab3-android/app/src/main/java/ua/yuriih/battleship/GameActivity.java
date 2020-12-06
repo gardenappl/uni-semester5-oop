@@ -18,6 +18,7 @@ public class GameActivity extends AppCompatActivity {
         state.registerView(fieldView);
         fieldView.setGameController(state);
 
+
     }
 
     @Override

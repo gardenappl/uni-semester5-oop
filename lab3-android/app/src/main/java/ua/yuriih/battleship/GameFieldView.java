@@ -27,12 +27,16 @@ public class GameFieldView extends View {
     public GameFieldView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        paintEmpty.setColor(Color.LTGRAY);
-        paintHit.setColor(Color.RED);
-        paintMissed.setColor(Color.YELLOW);
-        paintShip.setColor(Color.GREEN);
-        if (isInEditMode())
+        paintEmpty.setColor(context.getResources().getColor(R.color.colorCellEmpty));
+        paintHit.setColor(context.getResources().getColor(R.color.colorCellHit));
+        paintMissed.setColor(context.getResources().getColor(R.color.colorCellMiss));
+        paintShip.setColor(context.getResources().getColor(R.color.colorCellShip));
+        if (isInEditMode()) {
             controller = new GameController(context.getApplicationContext());
+            GameField field = controller.getField(Player.HUMAN);
+            for (int i = 0; i < 10; i++)
+                field.setCell(i, i, CellState.SHIP);
+        }
     }
 
     public void setGameController(GameController controller) {
