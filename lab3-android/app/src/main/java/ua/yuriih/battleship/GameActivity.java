@@ -5,7 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 
 public class GameActivity extends AppCompatActivity {
-    private GameController state = new GameController();
+    private GameController state;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -13,9 +13,11 @@ public class GameActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_game);
 
-        GameFieldView fieldView = findViewById(R.id.fullscreen_content);
+        GameFieldView fieldView = findViewById(R.id.game_field);
+        state = new GameController(getApplicationContext());
         state.registerView(fieldView);
         fieldView.setGameController(state);
+
     }
 
     @Override

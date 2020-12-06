@@ -10,12 +10,13 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import ua.yuriih.battleship.model.CellState;
+import ua.yuriih.battleship.model.GameField;
 import ua.yuriih.battleship.model.Player;
 
 public class GameFieldView extends View {
     private static final String LOGGING_TAG = "GameFieldView";
 
-    private GameController controller;
+    private GameController controller = null;
     private Player shownPlayer = Player.HUMAN;
 
     private Paint paintEmpty = new Paint();
@@ -30,10 +31,12 @@ public class GameFieldView extends View {
         paintHit.setColor(Color.RED);
         paintMissed.setColor(Color.YELLOW);
         paintShip.setColor(Color.GREEN);
+        if (isInEditMode())
+            controller = new GameController(context.getApplicationContext());
     }
 
-    public void setGameController(GameController state) {
-        this.controller = state;
+    public void setGameController(GameController controller) {
+        this.controller = controller;
     }
 
     public void showPlayer(Player player) {
@@ -65,6 +68,7 @@ public class GameFieldView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
+        GameField field = controller.getField(shownPlayer);
         int cellSize = getCellSize();
         int cellBorderSize = getCellBorderSize();
 
@@ -72,9 +76,9 @@ public class GameFieldView extends View {
             for (int y = 0; y < controller.getHeight(); y++) {
                 CellState cell;
                 if (shownPlayer == Player.AI)
-                    cell = controller.getCellAsOpponent(Player.AI, x, y);
+                    cell = field.getCellAsOpponent(x, y);
                 else
-                    cell = controller.getCell(Player.HUMAN, x, y);
+                    cell = field.getCell(x, y);
 
                 canvas.drawRect(x * cellSize + cellBorderSize, y * cellSize + cellBorderSize,
                         (x + 1) * cellSize - cellBorderSize, (y + 1) * cellSize - cellBorderSize,
@@ -85,6 +89,7 @@ public class GameFieldView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        super.onTouchEvent(event);
         int historySize = event.getHistorySize();
         int pointerCount = event.getPointerCount();
 
@@ -98,11 +103,6 @@ public class GameFieldView extends View {
         }
 
         return true;
-    }
-
-    @Override
-    public boolean performClick() {
-        return super.performClick();
     }
 
     private void onTouchEvent(float x, float y, int action, int pointerId) {
