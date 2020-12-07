@@ -35,52 +35,19 @@ public class StateCreateAIField extends GameState {
         controller.startNextState();
     }
 
-    private Point makeRandomPoint() {
-        GameController controller = getController();
-
-        return new Point(controller.getRNG().nextInt(controller.getWidth()),
-                controller.getRNG().nextInt(controller.getHeight()));
-    }
-
-    private Point getRandomTouchingPoint(Point point) {
-        Random rng = getController().getRNG();
-        randomLoop:
-        while (true) {
-            int direction = rng.nextInt(4);
-            switch (direction) {
-                case 0:
-                    if (point.x > 0)
-                        return new Point(point.x - 1, point.y);
-                    continue randomLoop;
-                case 1:
-                    if (point.x < getController().getWidth() - 1)
-                        return new Point(point.x + 1, point.y);
-                    continue randomLoop;
-                case 2:
-                    if (point.y > 0)
-                        return new Point(point.x, point.y - 1);
-                    continue randomLoop;
-                case 3:
-                    if (point.y < getController().getHeight() - 1)
-                        return new Point(point.x, point.y + 1);
-                    continue randomLoop;
-            }
-        }
-    }
-
     public void placeRandomPiece(int size, GameField aiField) {
         Point[] figurePoints = new Point[size];
 
         randomLoop:
         while (true) {
-            Point lastPoint = makeRandomPoint();
+            Point lastPoint = getController().makeRandomPoint();
             if (!aiField.isValidCellForShip(lastPoint))
                 continue;
 
             figurePoints[0] = lastPoint;
 
             for (int i = 1; i < size; i++) {
-                Point point = getRandomTouchingPoint(lastPoint);
+                Point point = getController().getRandomTouchingPoint(lastPoint);
                 for (int j = 0; j < i; j++) {
                     if (figurePoints[j].equals(point))
                         continue randomLoop;

@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Battleship</string>
-    <string name="switch_to_ai">See Enemy\'s Field</string>
-    <string name="switch_to_player">See Player\'s Field</string>
+    <string name="switch_to_ai">See opponent\'s field</string>
+    <string name="switch_to_player">Switch to your field</string>
     <string name="draw_your_field">Draw your field!</string>
     <string name="your_turn">Your turn</string>
     <string name="you_missed">You missed!</string>
@@ -12,4 +12,9 @@
     <string name="ai_hit">Opponent hit at %1$s</string>
     <string name="ai_missed">Opponent missed at %1$s</string>
     <string name="ai_sunk">Opponent destroyed ship at %1$s</string>
+    <plurals name="ai_sunk_multiple">
+        <item quantity="one">Opponent destroyed %d ship.</item>
+        <item quantity="other">Opponent destroyed %d ships!</item>
+    </plurals>
+    <string name="restart">Restart</string>
 </resources>

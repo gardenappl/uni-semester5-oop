@@ -6,7 +6,6 @@ import ua.yuriih.battleship.model.GameField;
 import ua.yuriih.battleship.model.Player;
 
 public class StateTurnHuman extends GameState {
-    private boolean missed;
     private boolean hit;
     private boolean destroyed;
 
@@ -16,42 +15,38 @@ public class StateTurnHuman extends GameState {
 
     @Override
     public void onTouchCellUp(Player player, int x, int y, int pointerId) {
-        if (player == Player.AI) {
-            GameField aiField = getController().getField(Player.AI);
-            CellState cell = aiField.getCell(x, y);
-            switch (cell) {
-                case EMPTY:
-                    aiField.setCell(x, y, CellState.MISSED);
-                    missed = true;
-                    break;
-                case SHIP:
-                    aiField.setCell(x, y, CellState.HIT);
-                    hit = true;
-                    destroyed = getController().checkShipDestroyed(Player.AI, x, y);
-                    break;
-                case HIT:
-                case MISSED:
-                    getController().vibrateForFailure();
-                    return;
-            }
-        }
+        GameController controller = getController();
+        if (player == Player.HUMAN)
+            return;
 
-        if (missed) {
-            getController().setNextState(new StateTurnAI(getController()));
+        GameField aiField = controller.getField(Player.AI);
+        CellState cell = aiField.getCell(x, y);
+        switch (cell) {
+            case EMPTY:
+                aiField.setCell(x, y, CellState.MISSED);
+                break;
+            case SHIP:
+                aiField.setCell(x, y, CellState.HIT);
+                hit = true;
+                destroyed = getController().checkShipDestroyed(Player.AI, x, y, true);
+                break;
+            case HIT:
+            case MISSED:
+                getController().vibrateForFailure();
+                return;
         }
 
         if (hit) {
-            if (destroyed && getController().checkVictory(Player.HUMAN))
-                getController().setNextState(new StateGameEnd(Player.HUMAN, getController()));
+            if (destroyed && controller.checkVictory(Player.HUMAN))
+                controller.setNextState(new StateGameEnd(Player.HUMAN, controller));
             else
-                getController().setNextState(new StateTurnHuman(getController()));
-            getController().redrawUI();
+                controller.setNextState(new StateTurnHuman(controller));
+        } else {
+            controller.setNextState(new StateTurnsAI(controller));
         }
-        getController().startNextState();
-    }
 
-    public boolean missed() {
-        return missed;
+        controller.redrawUI();
+        controller.startNextState();
     }
 
     public boolean hit() {

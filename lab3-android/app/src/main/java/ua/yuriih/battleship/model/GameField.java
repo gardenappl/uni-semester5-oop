@@ -29,6 +29,10 @@ public class GameField {
         return cells[y][x];
     }
 
+    public CellState getCell(Point point) {
+        return cells[point.y][point.x];
+    }
+
     public CellState getCellAsOpponent(int x, int y) {
         CellState cell = getCell(x, y);
         if (cell == CellState.SHIP)
@@ -37,8 +41,16 @@ public class GameField {
             return cell;
     }
 
+    public CellState getCellAsOpponent(Point point) {
+        return getCellAsOpponent(point.x, point.y);
+    }
+
     public void setCell(int x, int y, CellState state) {
         cells[y][x] = state;
+    }
+
+    public void setCell(Point point, CellState state) {
+        cells[point.y][point.x] = state;
     }
 
     public boolean isValidCellForShip(int x, int y, Set<Point> ignorePoints) {
@@ -63,5 +75,13 @@ public class GameField {
 
     public boolean isValidCellForShip(Point point) {
         return isValidCellForShip(point.x, point.y, Collections.<Point>emptySet());
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
     }
 }

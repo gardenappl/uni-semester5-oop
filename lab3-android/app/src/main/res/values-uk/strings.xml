@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Морський бій</string>
+    <string name="switch_to_ai">Показати карту суперника</string>
+    <string name="switch_to_player">Показати свою карту</string>
+    <string name="draw_your_field">Малюйте свою карту!</string>
+    <string name="your_turn">Ваш хід</string>
+    <string name="you_missed">Мимо!</string>
+    <string name="you_hit">Влучили!</string>
+    <string name="you_sunk">Потопили!</string>
+    <string name="you_win">Ви перемогли!</string>
+    <string name="you_lose">Ви програли!</string>
+    <string name="ai_hit">Суперник влучив у %1$s</string>
+    <string name="ai_missed">Суперник стріляв у %1$s, мимо!</string>
+    <string name="ai_sunk">Суперник потопив корабель на %1$s!</string>
+    <plurals name="ai_sunk_multiple">
+        <item quantity="one">Суперник потопив %d корабель.</item>
+        <item quantity="few">Суперник потопив %d кораблі!</item>
+        <item quantity="many">Суперник потопив %d кораблів!</item>
+        <item quantity="other">Суперник потопив %d кораблів!</item>
+    </plurals>
+    <string name="restart">Спробувати ще раз</string>
+</resources>

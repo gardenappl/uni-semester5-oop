@@ -1,6 +1,7 @@
 package ua.yuriih.battleship;
 
 import android.content.Context;
+import android.graphics.Point;
 import android.os.Vibrator;
 import android.util.Log;
 import android.view.View;
@@ -118,12 +119,11 @@ public class GameController {
     public void startNextState() {
         GameState oldState = this.state;
         GameState newState = this.nextState;
+        gameActivity.onStateChange(oldState, newState);
 
         this.state = this.nextState;
         this.nextState = null;
         this.state.start();
-
-        gameActivity.onStateChange(oldState, newState);
     }
 
     public void vibrateForFailure() {
@@ -131,18 +131,23 @@ public class GameController {
         vibrator.vibrate(50);
     }
 
-    public boolean checkShipDestroyed(Player player, int x, int y) {
-        GameField field = getField(player);
-        boolean[][] visited = new boolean[getHeight()][getWidth()];
-        if (Boolean.TRUE.equals(checkShipDestroyedRecursive(field, x, y, visited))) {
-            visited = new boolean[getHeight()][getWidth()];
-            markDestroyedShip(field, x, y, false, visited);
-            return true;
-        }
-        return false;
+    public boolean checkShipDestroyed(Player player, int x, int y, boolean mark) {
+        return checkShipUndamaged(player, x, y, mark) == null;
     }
 
-    private Boolean checkShipDestroyedRecursive(GameField field, int x, int y, boolean[][] visited) {
+    public Point checkShipUndamaged(Player player, int x, int y, boolean mark) {
+        GameField field = getField(player);
+        boolean[][] visited = new boolean[getHeight()][getWidth()];
+
+        Point undamagedTile = checkShipDestroyedRecursive(field, x, y, visited);
+        if (undamagedTile == null && mark) {
+            visited = new boolean[getHeight()][getWidth()];
+            markDestroyedShip(field, x, y, false, visited);
+        }
+        return undamagedTile;
+    }
+
+    private Point checkShipDestroyedRecursive(GameField field, int x, int y, boolean[][] visited) {
         if (x < 0 || x >= getWidth() || y < 0 || y >= getHeight())
             return null;
         if (visited[y][x])
@@ -154,18 +159,18 @@ public class GameController {
             return null;
 
         if (cell == CellState.SHIP)
-            return false;
+            return new Point(x, y);
 
-        if (Boolean.FALSE.equals(checkShipDestroyedRecursive(field, x - 1, y, visited)))
-            return false;
-        if (Boolean.FALSE.equals(checkShipDestroyedRecursive(field, x + 1, y, visited)))
-            return false;
-        if (Boolean.FALSE.equals(checkShipDestroyedRecursive(field, x, y - 1, visited)))
-            return false;
-        if (Boolean.FALSE.equals(checkShipDestroyedRecursive(field, x, y + 1, visited)))
-            return false;
-
-        return true;
+        Point result = checkShipDestroyedRecursive(field, x - 1, y, visited);
+        if (result != null)
+            return result;
+        result = checkShipDestroyedRecursive(field, x + 1, y, visited);
+        if (result != null)
+            return result;
+        result = checkShipDestroyedRecursive(field, x, y - 1, visited);
+        if (result != null)
+            return result;
+        return checkShipDestroyedRecursive(field, x, y + 1, visited);
     }
 
     private void markDestroyedShip(GameField field, int x, int y, boolean justMark, boolean[][] visited) {
@@ -210,5 +215,34 @@ public class GameController {
             }
         }
         return true;
+    }
+
+    public Point makeRandomPoint() {
+        return new Point(rng.nextInt(getWidth()), rng.nextInt(getHeight()));
+    }
+
+    public Point getRandomTouchingPoint(Point point) {
+        randomLoop:
+        while (true) {
+            int direction = rng.nextInt(4);
+            switch (direction) {
+                case 0:
+                    if (point.x > 0)
+                        return new Point(point.x - 1, point.y);
+                    continue randomLoop;
+                case 1:
+                    if (point.x < getWidth() - 1)
+                        return new Point(point.x + 1, point.y);
+                    continue randomLoop;
+                case 2:
+                    if (point.y > 0)
+                        return new Point(point.x, point.y - 1);
+                    continue randomLoop;
+                case 3:
+                    if (point.y < getHeight() - 1)
+                        return new Point(point.x, point.y + 1);
+                    continue randomLoop;
+            }
+        }
     }
 }

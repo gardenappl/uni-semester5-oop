@@ -9,5 +9,5 @@
     <color name="colorCellEmpty">#eee</color>
     <color name="colorCellShip">#5b5</color>
     <color name="colorCellHit">#b55</color>
-    <color name="colorCellMiss">#bb5</color>
+    <color name="colorCellMiss">#ee5</color>
 </resources>
