@@ -1,23 +1,24 @@
 package ua.yuriih.battleship;
 
 import android.content.Context;
-import android.graphics.Point;
 import android.os.Vibrator;
 import android.util.Log;
 import android.view.View;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import ua.yuriih.battleship.gamestates.GameState;
 import ua.yuriih.battleship.model.CellState;
 import ua.yuriih.battleship.model.GameField;
 import ua.yuriih.battleship.model.Player;
+import ua.yuriih.battleship.model.Point;
 
 public class GameController {
     private static final String LOGGING_TAG = "GameController";
 
-    private final Context appContext;
     private GameActivity gameActivity;
     private final Random rng;
 
@@ -32,8 +33,7 @@ public class GameController {
     private final ArrayList<View> views = new ArrayList<>();
 
 
-    public GameController(Context appContext) {
-        this.appContext = appContext;
+    public GameController() {
         humanField = new GameField(SIZE, SIZE);
         aiField = new GameField(SIZE, SIZE);
         rng = new Random();
@@ -59,10 +59,6 @@ public class GameController {
         return SIZE;
     }
 
-    public Context getApplicationContext() {
-        return appContext;
-    }
-
     public GameField getField(Player player) {
         switch (player) {
             case HUMAN:
@@ -80,10 +76,6 @@ public class GameController {
         if (size > 4)
             return 0;
         return maxCountForSize[size];
-    }
-
-    public boolean isAdjacent(int x1, int y1, int x2, int y2) {
-        return Math.abs(x2 - x1) <= 1 && Math.abs(y2 - y1) <= 1;
     }
 
     public boolean isTouching(int x1, int y1, int x2, int y2) {
@@ -119,7 +111,8 @@ public class GameController {
     public void startNextState() {
         GameState oldState = this.state;
         GameState newState = this.nextState;
-        gameActivity.onStateChange(oldState, newState);
+        if (gameActivity != null)
+            gameActivity.onStateChange(oldState, newState);
 
         this.state = this.nextState;
         this.nextState = null;
@@ -127,16 +120,22 @@ public class GameController {
     }
 
     public void vibrateForFailure() {
-        Vibrator vibrator = (Vibrator)appContext.getSystemService(Context.VIBRATOR_SERVICE);
-        vibrator.vibrate(50);
+        if (gameActivity != null) {
+            Vibrator vibrator = (Vibrator) gameActivity.getSystemService(Context.VIBRATOR_SERVICE);
+            vibrator.vibrate(50);
+        }
     }
 
     public boolean checkShipDestroyed(Player player, int x, int y, boolean mark) {
+        if (getField(player).getCell(x, y) != CellState.HIT)
+            return false;
         return checkShipUndamaged(player, x, y, mark) == null;
     }
 
-    public Point checkShipUndamaged(Player player, int x, int y, boolean mark) {
+    private Point checkShipUndamaged(Player player, int x, int y, boolean mark) {
         GameField field = getField(player);
+        if (field.getCell(x, y) != CellState.HIT)
+            throw new IllegalArgumentException("No ship at " + x + " " + y);
         boolean[][] visited = new boolean[getHeight()][getWidth()];
 
         Point undamagedTile = checkShipDestroyedRecursive(field, x, y, visited);
@@ -183,12 +182,12 @@ public class GameController {
         if (cell == CellState.EMPTY) {
             visited[y][x] = true;
             field.setCell(x, y, CellState.MISSED);
-            Log.d(LOGGING_TAG, "Marked " + x + " " + y + " as missed");
+            //Log.d(LOGGING_TAG, "Marked " + x + " " + y + " as missed");
         }
 
         if (cell == CellState.HIT && !justMark) {
             visited[y][x] = true;
-            Log.d(LOGGING_TAG, "Marking more starting from " + x + " " + y);
+            //Log.d(LOGGING_TAG, "Marking more starting from " + x + " " + y);
             markDestroyedShip(field, x - 1, y, false, visited);
             markDestroyedShip(field, x + 1, y, false, visited);
             markDestroyedShip(field, x, y - 1, false, visited);
@@ -244,5 +243,81 @@ public class GameController {
                     continue randomLoop;
             }
         }
+    }
+
+    public boolean isValidField(GameField field) {
+        boolean[][] marked = new boolean[field.getHeight()][field.getWidth()];
+
+        Map<Integer, Integer> shipCounts = new HashMap<>();
+        for (int size = 1; size <= 4; size++)
+            shipCounts.put(size, 0);
+
+        for (int x = 0; x < field.getWidth(); x++) {
+            for (int y = 0; y < field.getHeight(); y++) {
+                CellState cell = field.getCell(x, y);
+
+                if (cell == CellState.SHIP || cell == CellState.HIT) {
+                    ArrayList<Point> currentShip = new ArrayList<>(4);
+                    if (isInvalidShip(field, x, y, currentShip, marked))
+                        return false;
+
+                    if (!currentShip.isEmpty()) {
+                        if (shipHasInvalidSurroundings(field, currentShip))
+                            return false;
+                        int shipCount = shipCounts.get(currentShip.size());
+                        if (shipCount == getMaxShipCount(currentShip.size()))
+                            return false;
+                        shipCounts.put(currentShip.size(), shipCount + 1);
+                    }
+                }
+            }
+        }
+        for (int size = 1; size <= 4; size++) {
+            if (shipCounts.get(size) != getMaxShipCount(size))
+                return false;
+        }
+        return true;
+    }
+
+    private static boolean isInvalidShip(GameField field, int x, int y, ArrayList<Point> currentShip,
+                                         boolean[][] marked) {
+        if (x < 0 || x >= field.getWidth() || y < 0 || y >= field.getHeight())
+            return false;
+
+        if (marked[y][x])
+            return false;
+        marked[y][x] = true;
+
+        CellState cell = field.getCell(x, y);
+        if (cell != CellState.SHIP && cell != CellState.HIT)
+            return false;
+
+        currentShip.add(new Point(x, y));
+        if (currentShip.size() > 4)
+            return true;
+
+        if (isInvalidShip(field, x - 1, y, currentShip, marked))
+            return true;
+        if (isInvalidShip(field, x + 1, y, currentShip, marked))
+            return true;
+        if (isInvalidShip(field, x, y - 1, currentShip, marked))
+            return true;
+        if (isInvalidShip(field, x, y + 1, currentShip, marked))
+            return true;
+        return false;
+    }
+
+    private static boolean shipHasInvalidSurroundings(GameField field, ArrayList<Point> ship) {
+        for (Point point : ship) {
+            for (int x = Math.max(0, point.x - 1); x <= Math.min(field.getWidth() - 1, point.x + 1); x++) {
+                for (int y = Math.max(0, point.y - 1); y <= Math.min(field.getHeight() - 1, point.y + 1); y++) {
+                    Point neighbor = new Point(x, y);
+                    if (!ship.contains(neighbor) && (field.getCell(neighbor) == CellState.SHIP ||
+                            field.getCell(neighbor) == CellState.HIT))
+                        return true;
+                }
+            }
+        }
+        return false;
     }
 }

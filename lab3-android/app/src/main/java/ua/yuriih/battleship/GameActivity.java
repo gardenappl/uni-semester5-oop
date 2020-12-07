@@ -2,7 +2,6 @@ package ua.yuriih.battleship;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.graphics.Point;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -16,6 +15,7 @@ import ua.yuriih.battleship.gamestates.StateTurnHuman;
 import ua.yuriih.battleship.gamestates.StateTurnsAI;
 import ua.yuriih.battleship.model.GameField;
 import ua.yuriih.battleship.model.Player;
+import ua.yuriih.battleship.model.Point;
 
 public class GameActivity extends AppCompatActivity {
     private static final String LOGGING_TAG = "GameActivity";
@@ -53,7 +53,7 @@ public class GameActivity extends AppCompatActivity {
 
     private void startNewGame() {
         GameFieldView fieldView = findViewById(R.id.game_field);
-        controller = new GameController(getApplicationContext());
+        controller = new GameController();
         controller.registerView(fieldView);
         controller.setGameActivity(this);
         fieldView.setGameController(controller);
@@ -82,10 +82,6 @@ public class GameActivity extends AppCompatActivity {
         gameField.showPlayer(Player.HUMAN);
         Button switchButton = findViewById(R.id.switch_perspective);
         switchButton.setText(R.string.switch_to_ai);
-    }
-
-    public String prettyPrintPoint(Point point) {
-        return (char)('A' + point.x) + Integer.toString(point.y + 1);
     }
 
     public void onStateChange(GameState oldState, GameState newState) {
@@ -121,7 +117,7 @@ public class GameActivity extends AppCompatActivity {
         } else if (oldState instanceof StateTurnsAI) {
             if (((StateTurnsAI) oldState).getDestroyedShipCount() == 1) {
                 Point lastSinkPoint = ((StateTurnsAI) oldState).getLastSinkPoint();
-                gameStateLabel.setText(getString(R.string.ai_sunk, prettyPrintPoint(lastSinkPoint)));
+                gameStateLabel.setText(getString(R.string.ai_sunk, lastSinkPoint));
 
             } else if (((StateTurnsAI) oldState).getDestroyedShipCount() > 1) {
                 int destroyedCount = ((StateTurnsAI) oldState).getDestroyedShipCount();
@@ -130,11 +126,11 @@ public class GameActivity extends AppCompatActivity {
 
             } else if (((StateTurnsAI) oldState).hit()) {
                 Point lastHitPoint = ((StateTurnsAI) oldState).getLastHitPoint();
-                gameStateLabel.setText(getString(R.string.ai_hit, prettyPrintPoint(lastHitPoint)));
+                gameStateLabel.setText(getString(R.string.ai_hit, lastHitPoint));
 
             } else {
                 Point missPoint = ((StateTurnsAI) oldState).getMissPoint();
-                gameStateLabel.setText(getString(R.string.ai_missed, prettyPrintPoint(missPoint)));
+                gameStateLabel.setText(getString(R.string.ai_missed, missPoint));
             }
             focusOnHuman();
         } else if (oldState instanceof StateTurnHuman) {

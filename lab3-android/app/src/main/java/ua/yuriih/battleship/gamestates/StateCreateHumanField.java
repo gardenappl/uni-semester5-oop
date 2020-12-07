@@ -1,7 +1,6 @@
 package ua.yuriih.battleship.gamestates;
 
 import android.content.Context;
-import android.graphics.Point;
 import android.os.Vibrator;
 import android.util.Log;
 
@@ -15,6 +14,7 @@ import ua.yuriih.battleship.GameController;
 import ua.yuriih.battleship.model.CellState;
 import ua.yuriih.battleship.model.GameField;
 import ua.yuriih.battleship.model.Player;
+import ua.yuriih.battleship.model.Point;
 
 public class StateCreateHumanField extends GameState {
     private static final String LOGGING_TAG = "CreatePlayerField";

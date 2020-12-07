@@ -1,6 +1,5 @@
 package ua.yuriih.battleship.model;
 
-import android.graphics.Point;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -83,5 +82,18 @@ public class GameField {
 
     public int getHeight() {
         return height;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GameField gameField = (GameField) o;
+        return Arrays.deepEquals(cells, gameField.cells);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(cells);
     }
 }

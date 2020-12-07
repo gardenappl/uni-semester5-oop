@@ -1,13 +1,12 @@
 package ua.yuriih.battleship.gamestates;
 
-import android.graphics.Point;
-
 import java.util.ArrayList;
 
 import ua.yuriih.battleship.GameController;
 import ua.yuriih.battleship.model.CellState;
 import ua.yuriih.battleship.model.GameField;
 import ua.yuriih.battleship.model.Player;
+import ua.yuriih.battleship.model.Point;
 
 public class StateTurnsAI extends GameState {
     Point lastHitPoint;

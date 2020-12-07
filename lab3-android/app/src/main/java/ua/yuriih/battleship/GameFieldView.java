@@ -34,7 +34,7 @@ public class GameFieldView extends View {
         paintMissed.setColor(context.getResources().getColor(R.color.colorCellMiss));
         paintShip.setColor(context.getResources().getColor(R.color.colorCellShip));
         if (isInEditMode()) {
-            controller = new GameController(context.getApplicationContext());
+            controller = new GameController();
             GameField field = controller.getField(Player.HUMAN);
             for (int i = 0; i < 10; i++)
                 field.setCell(i, i, CellState.SHIP);
