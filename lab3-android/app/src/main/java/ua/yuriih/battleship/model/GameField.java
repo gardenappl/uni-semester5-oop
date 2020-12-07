@@ -16,6 +16,8 @@ public class GameField {
     private final int height;
 
     public GameField(int width, int height) {
+        if (width < 10 || height < 10)
+            throw new IllegalArgumentException("Width and height must be at least 10");
         cells = new CellState[width][height];
         for (CellState[] row : cells)
             Arrays.fill(row, CellState.EMPTY);

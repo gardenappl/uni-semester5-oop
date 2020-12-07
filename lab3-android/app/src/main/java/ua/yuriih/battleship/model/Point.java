@@ -13,7 +13,10 @@ public class Point {
 
     @Override
     public String toString() {
-        return (char)('A' + x) + Integer.toString(y + 1);
+        if (x >= 0 && x < 26)
+            return (char)('A' + x) + Integer.toString(y + 1);
+        else
+            return "(" + (x + 1) + ", " + (y + 1) + ')';
     }
 
     @Override
