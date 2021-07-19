@@ -103,6 +103,7 @@ public class StateCreateHumanField extends GameState {
             return false;
         }
     }
+
     @Override
     public void onTouchCellDown(Player player, int x, int y, int pointerId) {
         if (player == Player.HUMAN && currentDrawingPointerId == NOT_DRAWING) {

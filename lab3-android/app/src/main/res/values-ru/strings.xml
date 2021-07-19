@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Battleship</string>
+    <string name="switch_to_ai">Показать карту противника</string>
+    <string name="switch_to_player">Показать вашу карту</string>
+    <string name="draw_your_field">Рисуйте свою карту!</string>
+    <string name="your_turn">Ваша очередь</string>
+    <string name="you_missed">Мимо!</string>
+    <string name="you_hit">Ранили!</string>
+    <string name="you_sunk">Потопили!</string>
+    <string name="you_win">Вы победили!</string>
+    <string name="you_lose">Вы проиграли!</string>
+    <string name="ai_hit">Противник ранил %1$s</string>
+    <string name="ai_missed">Противник выстрелил в %1$s, мимо!</string>
+    <string name="ai_sunk">Противник потопил корабль на %1$s</string>
+    <plurals name="ai_sunk_multiple">
+        <item quantity="one">Противник потопил %d корабль!</item>
+        <item quantity="few">Противник потопил %d корабля!</item>
+        <item quantity="many">Противник потопил %d кораблей!</item>
+        <item quantity="other">Противник потопил %d кораблей!</item>
+    </plurals>
+    <string name="restart">Начать заново</string>
+</resources>
